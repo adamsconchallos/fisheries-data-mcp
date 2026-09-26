@@ -63,11 +63,27 @@ The `fishstat_production_by_country` tool returns all matching country rows and 
 
 **FishStat:** no account is needed. On first use, the server downloads the pinned [FAO Global Production 2026.1.0 ZIP](https://www.fao.org/fishery/static/Data/GlobalProduction_2026.1.0.zip). To use an already downloaded copy or work offline, set `FISHSTAT_ZIP` to its absolute path before launching your AI client.
 
-**BarentsWatch:** [register an API client](https://developer.barentswatch.no/docs/appreg/) and set `BARENTSWATCH_CLIENT_ID` and `BARENTSWATCH_CLIENT_SECRET` in the environment inherited by your AI client. Open-data API calls still require OAuth authentication. Keep the secret out of Git and shared configuration files.
+### BarentsWatch
 
-**Copernicus Marine:** [create a free account](https://help.marine.copernicus.eu/en/articles/4220332-how-to-register-for-copernicus-marine-service), then run `.venv/bin/copernicusmarine login` (macOS/Linux) or `.\.venv\Scripts\copernicusmarine.exe login` (Windows). The official Toolbox stores credentials locally; this server uses that Toolbox for catalogue and subset operations. Large gridded results should normally stay in NetCDF or Zarr rather than CSV.
+1. Create a user at [BarentsWatch MyPage](https://www.barentswatch.no/minside/), then register a **BarentsWatch API** client (not an AIS client) under developer access. Save the complete client ID and client secret. See the [official registration guide](https://developer.barentswatch.no/docs/appreg/).
+2. Set `BARENTSWATCH_CLIENT_ID` and `BARENTSWATCH_CLIENT_SECRET` in the environment that starts your MCP client. For a Windows PowerShell session, you can enter them without putting the secret in command history:
 
-Copernicus Marine downloads are limited to an estimated 200 MB output file and 500 MB transfer per request. CSV output requires a Toolbox version that supports it; NetCDF and Zarr work with version 2.0.1 or newer.
+   ```powershell
+   $env:BARENTSWATCH_CLIENT_ID = Read-Host "BarentsWatch client ID"
+   $bwSecret = Read-Host "BarentsWatch client secret" -AsSecureString
+   $env:BARENTSWATCH_CLIENT_SECRET = [System.Net.NetworkCredential]::new("", $bwSecret).Password
+   ```
+
+   Start your MCP client from **that same session** so it inherits the variables. For a desktop app started separately, arrange for its process environment to contain the two variables before restarting it. Do not commit secrets to Git or a shared configuration file. The server requests OAuth tokens automatically.
+3. Ask for a **locality ID and year**, for example: “Use BarentsWatch to retrieve weekly adult female salmon lice for locality 35657 in 2022; export the CSV and cite the source.” The [official tutorial](https://developer.barentswatch.no/docs/tutorial/) uses this example ID. The current server does not search locality names; consult the [Fish Health API documentation](https://developer.barentswatch.no/docs/fishhealth/) or BarentsWatch site to identify an ID.
+
+### Copernicus Marine
+
+1. [Create a free account](https://help.marine.copernicus.eu/en/articles/4220332-how-to-register-for-copernicus-marine-service), confirm your email, and set a password. Existing Copernicus Data Space Ecosystem credentials can also be used.
+2. In the installed project's environment, run `\.venv\Scripts\copernicusmarine.exe login` on Windows or `.venv/bin/copernicusmarine login` on macOS/Linux. Enter your username or email and password once. The [official Toolbox](https://help.marine.copernicus.eu/en/articles/8185007-copernicus-marine-toolbox-credentials-configuration) saves credentials in your home directory. Catalogue searches do not require login; downloads do.
+3. Ask the AI client to search for a dataset, describe its exact variables and units, then download a bounded subset. For example: “Search Copernicus Marine for sea temperature datasets. Describe a suitable dataset and show me its variable codes; then download the selected variable for 10–15°E, 68–72°N, 1–7 July 2024 as NetCDF.” Give a specific area and date range, and check the selected dataset before downloading.
+
+Copernicus Marine subsets are saved to `~/fisheries-data-mcp/exports` (or `FISHERIES_MCP_OUTPUT_DIR`) with a provenance JSON file. This server caps each request at an estimated 200 MB output file and 500 MB transfer; these are server safeguards, not Copernicus quotas. CSV output requires a Toolbox version that supports it; NetCDF and Zarr work with version 2.0.1 or newer. The current MCP downloads data but does not calculate averages from NetCDF/Zarr files or select a depth level.
 
 ## Scientific use
 
