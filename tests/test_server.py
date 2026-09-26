@@ -1,0 +1,65 @@
+"""Check that a real MCP client can discover and call a data tool."""
+
+import json
+import os
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+from unittest.mock import patch
+
+import copernicusmarine
+from mcp import Client, StdioServerParameters
+
+from fisheries_data_mcp.server import mcp
+
+
+class ServerTests(unittest.IsolatedAsyncioTestCase):
+    async def test_server_starts_over_stdio(self):
+        source_dir = Path(__file__).resolve().parents[1] / "src"
+        package_site = Path(copernicusmarine.__file__).resolve().parents[1]
+        params = StdioServerParameters(
+            command=sys.executable,
+            args=["-m", "fisheries_data_mcp.server"],
+            cwd=source_dir.parent,
+            env={
+                "PYTHONPATH": os.pathsep.join(
+                    [str(source_dir), str(package_site), os.environ.get("PYTHONPATH", "")]
+                )
+            },
+        )
+        async with Client(params) as client:
+            names = {tool.name for tool in (await client.list_tools()).tools}
+        self.assertIn("fishstat_production_by_country", names)
+        self.assertIn("describe_copernicus_dataset", names)
+
+    async def test_fishstat_query_is_discoverable_and_exports_csv(self):
+        sample = {
+            "query": "oyster",
+            "year": 2024,
+            "source": "all",
+            "unit": "tonnes live weight",
+            "source_url": "https://www.fao.org/fishery/static/Data/GlobalProduction_2026.1.0.zip",
+            "rows": [{"country": "Example", "country_code": "999", "year": 2024, "tonnes": 12.5, "status": "A", "warnings": []}],
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            with patch.dict(os.environ, {"FISHERIES_MCP_OUTPUT_DIR": directory}):
+                with patch("fisheries_data_mcp.server.fishstat.production_by_country", return_value=sample):
+                    async with Client(mcp) as client:
+                        listed = await client.list_tools()
+                        names = {tool.name for tool in listed.tools}
+                        self.assertIn("fishstat_production_by_country", names)
+                        self.assertIn("search_copernicus_datasets", names)
+                        self.assertIn("describe_copernicus_dataset", names)
+                        result = await client.call_tool(
+                            "fishstat_production_by_country", {"query": "oyster", "year": 2024}
+                        )
+                    self.assertFalse(result.is_error, result.content)
+                    output = json.loads(result.content[0].text)
+                    self.assertEqual(output["rows"][0]["tonnes"], 12.5)
+                    self.assertTrue(Path(output["csv_path"]).is_file())
+                    self.assertTrue(Path(output["metadata_path"]).is_file())
+
+
+if __name__ == "__main__":
+    unittest.main()
