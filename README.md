@@ -2,6 +2,8 @@
 
 A local [Model Context Protocol](https://modelcontextprotocol.io/) server for research queries across three marine data sources. Install it on your own computer, connect it to an MCP-compatible AI client, and ask questions in ordinary language. The server supplies data and provenance; your AI client writes the answer.
 
+**New to GitHub or MCP?** Start with the [beginner FAQ and quick start](FAQ.md). It covers downloading or cloning without a GitHub account, installing without VS Code, and connecting Codex or Claude Desktop Chat.
+
 ## Current coverage
 
 | Source | Available queries | Access |
@@ -51,7 +53,7 @@ codex mcp add fisheries-data -- "C:\full\path\to\fisheries_data_mcp\.venv\Script
 codex mcp list
 ```
 
-For **Claude Desktop**, place the JSON entry above in `claude_desktop_config.json` and restart the app. The [MCP Python SDK guide](https://py.sdk.modelcontextprotocol.io/get-started/real-host/) gives the configuration file locations for Windows and macOS.
+For **Claude Desktop Chat**, place the JSON entry above in `claude_desktop_config.json` and restart the app. The [MCP Python SDK guide](https://py.sdk.modelcontextprotocol.io/get-started/real-host/) gives the configuration file locations for Windows and macOS. This JSON configuration does not connect the server to Claude Cowork; see the [FAQ](FAQ.md#does-the-same-setup-work-in-claude-cowork).
 
 Try this prompt (Spanish or English):
 
