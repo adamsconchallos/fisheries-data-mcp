@@ -1,0 +1,28 @@
+[
+  {
+    "id": "comtrade_goods_hs",
+    "provider": "comtrade",
+    "title": "UN Comtrade merchandise trade by HS commodity",
+    "description": "Official country and partner trade records for goods, including aquatic products selected by Harmonized System commodity code. Query one reporter, period, commodity and flow at a time; annual and monthly data are supported.",
+    "topics": ["trade", "comercio", "bilateral", "imports", "importaciones", "exports", "exportaciones", "reexports", "reexportaciones", "seafood", "pescado", "fish", "salmon", "oysters", "ostras", "aquatic", "acuatico", "HS", "commodity", "producto", "value", "valor", "quantity", "cantidad"],
+    "variables": [
+      {"name": "primaryValue", "unit": "US dollars", "description": "Primary merchandise trade value; source CIF/FOB valuation depends on the country and flow."},
+      {"name": "netWgt", "unit": "kilograms", "description": "Net weight when available; this is product weight, not FishStat live weight."},
+      {"name": "qty", "unit": "record-specific qtyUnitAbbr", "description": "Primary quantity with its source unit, when available."}
+    ],
+    "dimensions": ["reporter country or area", "partner country or area", "HS commodity and edition", "trade flow", "annual or monthly period", "additional source dimensions and flags"],
+    "coverage": {"geography": "Countries and areas in UN Comtrade reporter and partner reference lists", "period": "Reporter- and commodity-specific; verify returned records", "frequency": "annual or monthly", "classification": "HS as reported or a selected HS edition H0-H6"},
+    "access": {"authentication": "Free UN Comtrade API subscription key required for downloads; set UN_COMTRADE_API_KEY. Reference-list search needs no key.", "method": "Official UN Comtrade data API and live reference lists"},
+    "download_tools": ["comtrade_trade_records"],
+    "search_tools": ["search_comtrade_reference"],
+    "limitations": [
+      "A free API subscription key is required. The free tier permits up to 100,000 records per call and 500 API calls per day; a result at the cap may be incomplete.",
+      "This connector retrieves one goods-trade selection at a time. It does not use premium bulk or tariff-line APIs.",
+      "UN Comtrade does not identify individual producer, buyer or supplier firms.",
+      "HS editions and product definitions can change over time. Aggregate and detailed HS codes must not be summed together.",
+      "UN Comtrade goods trade and FAO FishStat aquatic trade use different product classifications and weight bases; do not combine without a documented concordance."
+    ],
+    "references": ["https://uncomtrade.org/docs/un-comtrade-api/", "https://uncomtrade.org/docs/subscriptions/", "https://uncomtrade.org/docs/list-of-references-parameter-codes/", "https://comtradeapi.un.org/files/v1/app/reference/TradeDataItems.json"],
+    "verified_on": "2026-09-28"
+  }
+]

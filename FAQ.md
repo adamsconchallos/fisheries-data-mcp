@@ -32,7 +32,7 @@ A relevant entry is also not proof of a complete time series for your selection.
 | Python | Yes, version 3.11 or newer, to install and run the server. |
 | An AI client | Yes, for natural-language questions. It must support **local stdio MCP servers**. Codex in VS Code, Codex CLI and Claude Desktop Chat are documented below. The server itself does not require an AI account. |
 
-FishStat needs no data-source account. BarentsWatch and Copernicus Marine need their own credentials for the relevant tools; see the [credential setup](INSTALL.md#3-fill-in-the-local-env-file). You can start with FishStat and add those credentials later.
+FishStat needs no data-source account. UN Comtrade downloads require each user's own free API subscription key; its reference-code searches remain public. BarentsWatch and Copernicus Marine need their own credentials for the relevant tools; see the [credential setup](INSTALL.md#3-fill-in-the-local-env-file).
 
 ## Does the server provide all FishStat data?
 
@@ -176,13 +176,13 @@ For BarentsWatch, you can ask:
 
 The client can use `barentswatch_search_localities` to resolve a name or ID and `barentswatch_get_locality_data` for the selected site-year. Other supported selections include treatments, disease cases, escapes and permitted capacity. `barentswatch_get_locality_details` retrieves a nested JSON site snapshot for a specific ISO week. Locality search is a current directory, not a historical list of operating salmon farms. Check `hasReportedLice` and `hasReported`: a zero associated with no report is not evidence of a measured zero.
 
-The FishStat tools write a CSV and a metadata JSON file, by default under `~/fisheries-data-mcp/exports`. You can set `FISHERIES_MCP_OUTPUT_DIR` to choose another folder. The [technical reference](docs/REFERENCE.md) lists the current tools and output details.
+The FishStat and UN Comtrade tools write a CSV and a metadata JSON file, by default under `~/fisheries-data-mcp/exports`. You can set `FISHERIES_MCP_OUTPUT_DIR` to choose another folder. The [technical reference](docs/REFERENCE.md) lists the current tools and output details.
 
 You can also ask: "Before downloading, explain what each row and column represents, the units and the available years." FishStat and BarentsWatch CSV exports list the actual columns and row count, with descriptions for their standard fields. FishStat's Global Production country table groups and sums the selected source records; its Global Aquaculture table preserves the selected observations. BarentsWatch preserves provider records and flags, including reported weekly means and event details where applicable. Copernicus downloads a subset without calculating averages and returns dataset metadata; its file structure varies by dataset and format.
 
 ## Will adding more sources require a new installation for each one?
 
-New sources will be added to this same server. Updating the project will make their tools available through your existing connection. Fill in any optional credentials for the sources you want to use; an account for every provider is not required. Comtrade is planned but is not yet available.
+New sources are added to this same server. Updating the project makes their tools available through your existing connection. Fill in the credentials for each source you want to use; UN Comtrade downloads specifically require a free API subscription key. It reports country-product trade, not individual producer or buyer firms.
 
 ## How do I update it or fix a missing tool?
 

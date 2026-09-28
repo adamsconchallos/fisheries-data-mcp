@@ -100,9 +100,10 @@ BARENTSWATCH_CLIENT_ID=your_full_client_id
 BARENTSWATCH_CLIENT_SECRET=your_client_secret
 COPERNICUSMARINE_SERVICE_USERNAME=your_username_or_email
 COPERNICUSMARINE_SERVICE_PASSWORD=your_password
+UN_COMTRADE_API_KEY=your_subscription_key
 ```
 
-Leave unused fields empty. FishStat needs no credentials. Obtain the BarentsWatch ID and secret by [registering a BarentsWatch API client](https://developer.barentswatch.no/docs/appreg/); use your [Copernicus Marine account](https://help.marine.copernicus.eu/en/articles/4220332-how-to-register-for-copernicus-marine-service) for Copernicus downloads. An existing saved `copernicusmarine login` can be used with its two fields left empty. Comtrade is planned but not yet connected.
+Leave unused fields empty. FishStat needs no credentials. UN Comtrade downloads require your own [free API subscription key](https://uncomtrade.org/docs/api-subscription-keys/); obtain it from the UN Comtrade Developer Portal and enter it as `UN_COMTRADE_API_KEY`. Reference-code searches work without a key. Obtain the BarentsWatch ID and secret by [registering a BarentsWatch API client](https://developer.barentswatch.no/docs/appreg/); use your [Copernicus Marine account](https://help.marine.copernicus.eu/en/articles/4220332-how-to-register-for-copernicus-marine-service) for Copernicus downloads. An existing saved `copernicusmarine login` can be used with its two fields left empty. Existing `.env` files are preserved by the installer: add the `UN_COMTRADE_API_KEY` line yourself when updating an earlier installation.
 
 Save and close the file. The server reads it automatically, even if the AI client starts from a different folder. These are **data-provider credentials**; sign in to your AI service in its own app. Do not put the secrets in a chat. `.env` is excluded from Git but contains plain text; a folder synchronized with OneDrive can still synchronize it. The [FAQ](FAQ.md#how-do-data-source-credentials-reach-the-local-server) explains alternative file locations.
 

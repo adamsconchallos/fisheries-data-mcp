@@ -35,7 +35,7 @@ class CatalogueTests(unittest.TestCase):
         self.assertEqual(inventory["count"], len(inventory["datasets"]))
         self.assertEqual(
             {entry["provider"] for entry in inventory["datasets"]},
-            {"fishstat", "barentswatch", "copernicus_marine"},
+            {"fishstat", "barentswatch", "copernicus_marine", "comtrade"},
         )
         statuses = set()
         for summary in inventory["datasets"]:

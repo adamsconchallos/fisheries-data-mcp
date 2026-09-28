@@ -14,7 +14,7 @@ from mcp.server.mcpserver.exceptions import ToolError
 from .settings import load_local_credentials
 
 load_local_credentials()  # Copernicus Marine reads environment credentials during import.
-from . import barentswatch, catalogue, copernicus, fishstat
+from . import barentswatch, catalogue, comtrade, copernicus, fishstat
 
 
 mcp = MCPServer(
@@ -35,6 +35,10 @@ mcp = MCPServer(
         "The catalogue documents more FishStat collections and BarentsWatch services than the "
         "implemented download tools. Read access requirements and limitations before recommending a route. "
         "Use the live Copernicus catalogue for its dataset-level coverage. "
+        "For UN Comtrade, resolve reporter, partner, flow and HS codes before requesting trade records. "
+        "UN Comtrade downloads require the user's free API subscription key. "
+        "A Comtrade query at its record limit may be incomplete; never present it as a full extract. "
+        "Comtrade goods trade is classified by HS code and country, not by producer company. "
         "Preserve provider reporting flags: an unreported observation must not be presented as a measured zero."
     ),
 )
@@ -133,6 +137,15 @@ def list_data_sources() -> dict:
                 "url": "https://data.marine.copernicus.eu/",
                 "output_structure": "NetCDF or Zarr subset; CSV when supported by the installed Toolbox. Variables, units and dimensions depend on the dataset: call describe_copernicus_dataset before downloading. The server does not calculate spatial or temporal averages.",
             },
+            {
+                "id": "comtrade",
+                "name": "UN Comtrade goods trade",
+                "covers": "Annual or monthly bilateral merchandise trade by reporter, partner, HS commodity and flow.",
+                "tools": ["search_comtrade_reference", "comtrade_trade_records"],
+                "url": "https://comtradeplus.un.org/",
+                "table_structure": comtrade.TABLE_STRUCTURE,
+                "limitations": "A free UN Comtrade API subscription key is required for downloads. The connector requests at most 100,000 records per call; a result at the limit may be incomplete. These are country-product trade records, not company-level producer links.",
+            },
         ],
         "scope_note": "Search, describe and download data with source metadata. The server prepares source-specific selections and documented country totals; statistical analysis, scientific interpretation and joins between sources are outside its scope.",
     }
@@ -140,7 +153,7 @@ def list_data_sources() -> dict:
 
 @mcp.tool()
 def list_datasets(provider: str = "all") -> dict:
-    """List the reviewed dataset inventory and which datasets have MCP download tools. Providers: all, fishstat, barentswatch, copernicus_marine. Includes catalogue-only datasets with external/manual access routes."""
+    """List reviewed datasets and download status. Providers: all, fishstat, barentswatch, copernicus_marine, comtrade."""
     try:
         return catalogue.list_datasets(provider)
     except Exception as exc:
@@ -208,6 +221,36 @@ def fishstat_production_by_country(
     try:
         result = fishstat.production_by_country(query, year, source, species_code or None)
         result.update(_export_rows(result.get("rows", []), {k: v for k, v in result.items() if k != "rows"}, f"fishstat-{query}-{year}"))
+        return result
+    except Exception as exc:
+        raise _tool_error(exc) from exc
+
+
+@mcp.tool()
+def search_comtrade_reference(kind: str, query: str, classification: str = "HS", limit: int = 20) -> dict:
+    """Find UN Comtrade reporter, partner, HS commodity or trade-flow codes from official live reference lists. For commodity codes, classification is HS (as reported) or H0-H6 (specific HS edition); names in the source lists are English. A code match does not prove data availability."""
+    try:
+        return comtrade.search_reference(kind, query, classification, limit)
+    except Exception as exc:
+        raise _tool_error(exc) from exc
+
+
+@mcp.tool()
+def comtrade_trade_records(
+    period: str, reporter_code: int, commodity_code: str, flow_code: str,
+    partner_code: int = 0, frequency: str = "A", classification: str = "HS",
+) -> dict:
+    """Download UN Comtrade goods records for one annual YYYY or monthly YYYYMM period, one reporter, one HS code and one flow (M import, X export, RM re-import, RX re-export). partner_code=0 means World. Use search_comtrade_reference to resolve codes. Requires UN_COMTRADE_API_KEY from a free subscription; requests at most 100,000 records per call. A result at the limit is flagged as possibly incomplete. Preserves original API fields and exports CSV plus provenance metadata; returns up to 20 preview rows. Do not treat HS aggregate levels as additive or trade value as producer revenue."""
+    try:
+        result = comtrade.trade_records(
+            period, reporter_code, commodity_code, flow_code, partner_code, frequency, classification
+        )
+        rows = result.pop("rows")
+        result.update(_export_rows(
+            rows, result, f"comtrade-{reporter_code}-{partner_code}-{commodity_code}-{flow_code}-{period}"
+        ))
+        result["row_count"] = len(rows)
+        result["rows_preview"] = rows[:20]
         return result
     except Exception as exc:
         raise _tool_error(exc) from exc

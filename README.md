@@ -11,8 +11,9 @@ A local [Model Context Protocol](https://modelcontextprotocol.io/) server that c
 | FAO FishStat | Capture and aquaculture production quantities; aquaculture production values | No account required |
 | BarentsWatch | Norwegian aquaculture sites, lice, temperature, treatments, diseases, escapes, permitted capacity and site details | BarentsWatch API client ID and secret |
 | Copernicus Marine | Ocean datasets selected by variable, geographic area and dates | Copernicus Marine account for downloads |
+| UN Comtrade | Annual or monthly goods trade by country, partner, HS product and flow | Free API subscription key required for downloads |
 
-The catalogue also describes collections whose downloads are not implemented. These are marked `catalogue_only`; entries with download tools are marked `downloadable`. Availability still depends on the requested species, place, period and your access. Comtrade is planned.
+The catalogue also describes collections whose downloads are not implemented. These are marked `catalogue_only`; entries with download tools are marked `downloadable`. Availability still depends on the requested species, place, period and your access.
 
 ## How to install
 
@@ -82,9 +83,10 @@ BARENTSWATCH_CLIENT_ID=your_client_id
 BARENTSWATCH_CLIENT_SECRET=your_client_secret
 COPERNICUSMARINE_SERVICE_USERNAME=your_username
 COPERNICUSMARINE_SERVICE_PASSWORD=your_password
+UN_COMTRADE_API_KEY=your_subscription_key
 ```
 
-Save `.env` **beside `install.py`**. FishStat needs no credentials. Obtain the other credentials by [registering a BarentsWatch API client](https://developer.barentswatch.no/docs/appreg/) or [creating a Copernicus Marine account](https://help.marine.copernicus.eu/en/articles/4220332-how-to-register-for-copernicus-marine-service).
+Save `.env` **beside `install.py`**. FishStat needs no credentials. UN Comtrade downloads require each user's own [free API subscription key](https://uncomtrade.org/docs/api-subscription-keys/); reference-code searches remain public. Obtain the other credentials by [registering a BarentsWatch API client](https://developer.barentswatch.no/docs/appreg/) or [creating a Copernicus Marine account](https://help.marine.copernicus.eu/en/articles/4220332-how-to-register-for-copernicus-marine-service).
 
 ### 6. Restart and ask
 

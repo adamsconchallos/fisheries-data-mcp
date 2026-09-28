@@ -6,10 +6,10 @@ import unicodedata
 from importlib.resources import files
 
 
-PROVIDERS = ("fishstat", "barentswatch", "copernicus_marine")
+PROVIDERS = ("fishstat", "barentswatch", "copernicus_marine", "comtrade")
 CATALOGUE_SCOPE = (
-    "Reviewed inventory of current FAO FishStatJ collections and BarentsWatch data services; "
-    "Copernicus has a live catalogue through search_copernicus_datasets. "
+    "Reviewed inventory of current FAO FishStatJ collections, BarentsWatch data services and "
+    "UN Comtrade goods trade; Copernicus has a live catalogue through search_copernicus_datasets. "
     "Each entry records its documentation date and source references. "
     "Catalogue knowledge is broader than the server's implemented download tools."
 )

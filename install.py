@@ -61,6 +61,7 @@ def main() -> int:
     print("\nInstallation complete.")
     print(f"1. Optional: open {credentials} in a text editor and fill in the credentials you need.")
     print("   FishStat does not require credentials. Leave unused fields blank.")
+    print("   UN Comtrade downloads require your own free API subscription key in UN_COMTRADE_API_KEY.")
     print(f"2. Import {config} into a compatible MCP client, or copy its fisheries-data entry")
     print("   into the client's mcpServers configuration. For other clients, register this command:")
     print(f"   {server}")

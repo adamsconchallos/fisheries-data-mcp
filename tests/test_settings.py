@@ -20,6 +20,7 @@ class CredentialSettingsTests(unittest.TestCase):
                 "BARENTSWATCH_CLIENT_ID=from_file\n"
                 "BARENTSWATCH_CLIENT_SECRET=${HOME}sample_secret\n"
                 "COPERNICUSMARINE_SERVICE_USERNAME=\n"
+                "UN_COMTRADE_API_KEY=example_comtrade_key\n"
                 "UNRELATED_VARIABLE=ignored\n",
                 encoding="utf-8",
             )
@@ -29,6 +30,7 @@ class CredentialSettingsTests(unittest.TestCase):
                     self.assertEqual(os.environ["BARENTSWATCH_CLIENT_ID"], "from_process")
                     self.assertEqual(os.environ["BARENTSWATCH_CLIENT_SECRET"], "${HOME}sample_secret")
                     self.assertNotIn("COPERNICUSMARINE_SERVICE_USERNAME", os.environ)
+                    self.assertEqual(os.environ["UN_COMTRADE_API_KEY"], "example_comtrade_key")
                     self.assertNotIn("UNRELATED_VARIABLE", os.environ)
 
     def test_copernicus_sees_env_credentials_on_fresh_server_import(self):

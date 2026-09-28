@@ -36,6 +36,7 @@ class ServerTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("fishstat_aquaculture_records", names)
         self.assertIn("search_fishstat_countries", names)
         self.assertIn("describe_copernicus_dataset", names)
+        self.assertIn("comtrade_trade_records", names)
 
     async def test_fishstat_query_is_discoverable_and_exports_csv(self):
         sample = {
