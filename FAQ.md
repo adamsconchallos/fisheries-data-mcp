@@ -1,5 +1,7 @@
 # Beginner FAQ and quick start
 
+For the complete sequence, use the [four-step installation guide](INSTALL.md): install Python, clone or download the repository, fill in `.env`, and connect your AI client. It includes Windows commands and the differences between Codex in VS Code, Claude Chat, Cowork and browser chats.
+
 This guide is for researchers who want to ask questions through an AI client and receive source-backed fisheries data and CSV files. The server runs on **your computer**. The AI client starts it and discovers its tools.
 
 The server finds, describes and downloads data. It explains columns, units and data preparation; statistical analyses and scientific interpretation belong in your subsequent research workflow.
@@ -12,7 +14,7 @@ The server finds, describes and downloads data. It explains columns, units and d
 | VS Code | No. A terminal (PowerShell on Windows, Terminal on macOS/Linux) is enough. |
 | Git | Only if you choose to clone the repository. You can download a ZIP instead. |
 | Python | Yes, version 3.11 or newer, to install and run the server. |
-| An AI client | Yes, for natural-language questions. It must support **local stdio MCP servers**. Codex CLI and Claude Desktop Chat are documented below. The server itself does not require an AI account. |
+| An AI client | Yes, for natural-language questions. It must support **local stdio MCP servers**. Codex in VS Code, Codex CLI and Claude Desktop Chat are documented below. The server itself does not require an AI account. |
 
 FishStat needs no data-source account. BarentsWatch and Copernicus Marine need their own credentials for the relevant tools; see the [README](README.md#credentials). You can start with FishStat and add those credentials later.
 
@@ -33,7 +35,7 @@ For GitHub basics, see [GitHub's cloning guide](https://docs.github.com/en/repos
 
 ## How do I install the server?
 
-Install [Python 3.11 or newer](https://www.python.org/downloads/) first. In the repository folder, run one command for your system:
+Install [Python 3.11 or newer](https://www.python.org/downloads/) first; the [installation guide](INSTALL.md#1-install-python-if-needed) provides the Windows installation command. In the repository folder, run one command for your system:
 
 **Windows PowerShell**
 
@@ -48,6 +50,10 @@ python3 install.py
 ```
 
 The installer prepares the `.venv` environment and downloads Python dependencies. It also creates `.env` for optional credentials and `mcp-config.json` with your server's absolute path. Existing `.env` credentials are preserved when you rerun it. The first FishStat query downloads and caches the FAO data ZIP. You do **not** need the FishStat desktop `.exe`.
+
+## How do I use it with Codex in VS Code?
+
+Configure the server inside the Codex extension; the CLI is optional. Follow the [VS Code walkthrough](INSTALL.md#codex-in-vs-code), including how to obtain the executable path and the fallback `config.toml` entry. The configuration belongs to the Codex host where the server will run. [Official Codex documentation](https://developers.openai.com/learn/docs-mcp).
 
 ## How do I use it with Codex?
 
@@ -69,7 +75,7 @@ codex mcp add fisheries-data -- "$server"
 codex mcp list
 ```
 
-`codex mcp list` confirms registration. Start Codex and enter `/mcp` to check that the server's tools are available. Then try the question below. See [OpenAI's MCP guide](https://learn.chatgpt.com/docs/extend/mcp?surface=cli) if your Codex interface differs. The ChatGPT desktop app also supports local stdio servers through **Settings → MCP servers**; a browser session does not read your local Codex configuration.
+`codex mcp list` confirms registration. Start Codex and enter `/mcp` to check that the server's tools are available. Then try the question below. This CLI configuration also applies to the Codex IDE extension on the same host. See [OpenAI's MCP guide](https://developers.openai.com/learn/docs-mcp).
 
 ## How do I use it with Claude Desktop Chat?
 
@@ -88,7 +94,7 @@ Fully quit and reopen Claude Desktop, then check the available connectors/tools 
 
 The MCP server reads a `.env` file from this repository when your AI client starts it. You do not need to put credentials in Codex's `config.toml`, Claude Desktop's JSON, or an AI prompt. FishStat needs no credentials.
 
-The installer has already created `.env` in the repository folder. Open it in a text editor. On Windows:
+The installer has already created `.env` in the repository folder, beside `install.py` and outside `.venv`. Keep it there and open it in a text editor. On Windows:
 
 **Windows PowerShell**
 
@@ -113,7 +119,13 @@ For a manual installation, copy `.env.example` to `.env` once if `.env` does not
 
 ## Does the same setup work in Claude Cowork?
 
-**Not yet.** The `claude_desktop_config.json` entry above connects to Claude Desktop **Chat**, but [Anthropic says it is unavailable in Cowork](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp). Cowork needs a separately packaged plugin with a local MCP server in a compatible desktop session, or a hosted remote MCP server. This repository has not packaged or tested either Cowork route. See [Anthropic's plugin support guide](https://claude.com/docs/plugins/platform-support). If you want to use this repository now, use Codex CLI or Claude Desktop Chat.
+**Not yet.** The `claude_desktop_config.json` entry above connects to Claude Desktop **Chat**, but [Anthropic says it is unavailable in Cowork](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp). Cowork can use local MCP servers packaged in plugins for local sessions, or remote connectors. This repository does not yet supply either route. If you downloaded Claude for Cowork, use its **Chat** interface with the local configuration above. [Desktop and web connectors](https://support.claude.com/en/articles/11725091-when-to-use-desktop-and-web-connectors).
+
+## What if I only use ChatGPT or Claude in a browser?
+
+This repository's local executable cannot be launched directly by those browser chats. Use a compatible desktop client with the [connection steps](INSTALL.md#4-connect-your-ai-client-and-ask-for-data). VS Code is optional. Direct browser access would need a remote deployment or bridge, which this repository does not currently provide. [OpenAI remote MCP setup](https://developers.openai.com/plugins/build/app-quickstart), [Claude remote connector requirements](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp).
+
+The [ChatGPT desktop route](INSTALL.md#chatgpt-desktop-app-without-vs-code) is also documented for installations with local MCP settings available.
 
 ## What can I ask?
 

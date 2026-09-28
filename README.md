@@ -4,7 +4,7 @@ A local [Model Context Protocol](https://modelcontextprotocol.io/) server to **f
 
 Its scope is data access and preparation: selecting records, downloading bounded subsets, and producing documented country totals where supported. Statistical analysis, modelling, scientific interpretation and joins between sources are outside the server's scope.
 
-**New to GitHub or MCP?** Start with the [beginner FAQ and quick start](FAQ.md). It covers downloading or cloning without a GitHub account, installing without VS Code, and connecting Codex or Claude Desktop Chat.
+**New to GitHub or MCP?** Follow the [four-step installation guide](INSTALL.md): install Python, clone or download, fill in `.env`, and connect your AI client. It covers Codex in VS Code, Claude Desktop Chat, and the current limits for Cowork and browser chats. The [beginner FAQ](FAQ.md) covers updates and troubleshooting.
 
 ## Current coverage
 
@@ -19,6 +19,8 @@ The sources describe different quantities and spatial scales, and each download 
 ## Install locally
 
 Requires Python 3.11 or newer. Download or clone this repository, open a terminal in its folder, and run one command:
+
+The [installation guide](INSTALL.md#1-install-python-if-needed) provides the Python installation command and both GitHub download routes.
 
 **Windows PowerShell**
 
@@ -35,6 +37,8 @@ python3 install.py
 The installer creates or reuses `.venv`, installs the server, creates an empty `.env` template if needed, and generates `mcp-config.json` with the correct absolute executable path. Rerunning it updates the package and preserves your existing `.env`.
 
 Connect a client that supports local **stdio** MCP servers. If the client uses `mcpServers` JSON, copy the `fisheries-data` entry from the generated `mcp-config.json` into its configuration. If it asks for an executable, use the path printed by the installer. Configuration locations vary by client; the [FAQ](FAQ.md) explains the steps. Restart the client after adding the server.
+
+If you use **Codex in VS Code**, follow its [extension setup](INSTALL.md#codex-in-vs-code); a separate CLI installation is optional.
 
 For **Codex CLI**, the [official MCP setup](https://developers.openai.com/learn/docs-mcp) uses `codex mcp add`. From the repository folder on Windows:
 
