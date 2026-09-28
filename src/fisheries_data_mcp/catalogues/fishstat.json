@@ -1,0 +1,301 @@
+[
+  {
+    "id": "fishstat_global_production",
+    "provider": "fishstat",
+    "title": "FAO Global Fishery and Aquaculture Production",
+    "description": "Annual capture and aquaculture production by country, aquatic species, fishing area and production source, including salmon, oysters and seaweeds. The MCP download returns country totals in tonnes for one selected year; the source's finer dimensions and other measures are documented for context.",
+    "topics": ["production", "produccion", "producción", "capture", "captura", "aquaculture", "acuicultura", "tonnes", "toneladas", "salmon", "salmones", "salmón", "oyster", "oysters", "ostras", "seaweed", "algas", "Norway", "Noruega"],
+    "variables": [
+      {"name": "production_quantity", "unit": "tonnes", "description": "Live weight for aquatic animals; wet weight for aquatic plants. The current country tool reads measure Q_tlw.", "download_supported": true},
+      {"name": "production_number", "unit": "number of animals", "description": "The source collection also reports whales, seals and crocodiles in numbers. This measure is not supported by the current tonnes tool.", "download_supported": false}
+    ],
+    "dimensions": ["country or area", "ASFIS species item", "FAO major fishing area", "production source: capture, freshwater aquaculture, brackishwater aquaculture, marine aquaculture", "year", "measure", "observation status"],
+    "coverage": {"start_year": 1950, "end_year": 2024, "geography": "Global reporting countries and areas", "frequency": "annual", "note": "Availability varies by selected country, species and year. The country download tool accepts one year per call."},
+    "access": {"authentication": "none", "method": "Public FAO CSV ZIP, downloaded and cached on first use; FishStatJ is not required."},
+    "download_tools": ["fishstat_production_by_country"],
+    "catalogue_only": false,
+    "limitations": [
+      "The current tool sums available quantities by country across selected species and areas; it does not return all original source dimensions.",
+      "source=all combines capture with all aquaculture environments. Select the source appropriate to the question.",
+      "The current tool supplies quantities only. Use fishstat_aquaculture_records for aquaculture production value.",
+      "Do not add this combined collection to its Capture or Aquaculture component collections; that would count production twice.",
+      "Respect source observation flags, missing and suppressed values, and country notes. Country totals may be partial."
+    ],
+    "references": ["https://www.fao.org/fishery/static/Data/GlobalProduction_2026.1.0.zip", "https://www.fao.org/fishery/static/FishStatJ/FAO_FI_Global_Production_2026.1.0.fws", "https://www.fao.org/statistics/events/events-detail/global-production.-march-2026-update/en"],
+    "archive_url": "https://www.fao.org/fishery/static/Data/GlobalProduction_2026.1.0.zip",
+    "workspace_acronym": "FAO_FI_GLOBAL_PROD",
+    "version": "2026.1.0",
+    "verified_on": "2026-09-28"
+  },
+  {
+    "id": "fishstat_aquaculture",
+    "provider": "fishstat",
+    "title": "FAO Global Aquaculture Production: Quantities and Values",
+    "description": "Aquaculture harvest quantities and monetary production values by country, species, fishing area and culture environment. Suitable for finding annual salmon production and its value in Norway, or oyster and seaweed farming series, before a researcher performs analysis.",
+    "topics": ["aquaculture", "acuicultura", "production", "produccion", "producción", "production value", "valor de produccion", "valor de producción", "quantity", "tonnes", "toneladas", "USD", "salmon", "salmones", "salmón", "oyster", "oysters", "ostras", "seaweed", "algas", "Norway", "Noruega", "mariculture", "maricultura"],
+    "variables": [
+      {"name": "Q_tlw", "unit": "tonnes", "description": "Aquaculture quantity: animals in live weight and aquatic plants in wet weight; 1950–2024."},
+      {"name": "V_USD_1000", "unit": "thousands of nominal US dollars", "description": "Aquaculture production value converted from national currencies; 1984–2024."}
+    ],
+    "dimensions": ["country or area", "ASFIS species item", "FAO major fishing area", "culture environment", "year", "measure", "observation status"],
+    "coverage": {"start_year": 1950, "end_year": 2024, "value_start_year": 1984, "geography": "Global reporting countries and areas", "frequency": "annual", "note": "Quantity and monetary value may have different availability for a selected series."},
+    "access": {"authentication": "none", "method": "Public FAO CSV ZIP, separately cached from Global Production; FishStatJ is not required."},
+    "download_tools": ["fishstat_aquaculture_records"],
+    "catalogue_only": false,
+    "limitations": [
+      "The downloaded long-format table preserves original observations; quantity and value are separate rows with their own measure, unit and flag.",
+      "Production value is not export value, profit or an inflation-adjusted measure.",
+      "The tool does not compute growth, prices, real monetary values or relationships with fish-health observations.",
+      "National annual production cannot be matched directly to an individual farm or to weekly lice observations without a separate analytical design.",
+      "Missing and suppressed source values remain empty, with flags retained; an empty value is not a measured zero.",
+      "Country totals may require summation across areas, environments or species, depending on the research definition."
+    ],
+    "references": ["https://www.fao.org/fishery/static/Data/Aquaculture_2026.1.0.zip", "https://www.fao.org/statistics/data-collection/fishery-and-aquaculture/en", "https://www.fao.org/statistics/events/events-detail/global-production.-march-2026-update/en"],
+    "archive_url": "https://www.fao.org/fishery/static/Data/Aquaculture_2026.1.0.zip",
+    "workspace_acronym": "FAO_FI_GLOBAL_PROD",
+    "version": "2026.1.0",
+    "verified_on": "2026-09-28"
+  },
+  {
+    "id": "fishstat_capture",
+    "provider": "fishstat",
+    "title": "FAO Global Capture Production",
+    "description": "Annual nominal catches landed from wild aquatic resources by country, species and FAO major fishing area, with quantity measures appropriate to each species group.",
+    "topics": ["capture", "captura", "wild fisheries", "pesca", "landings", "desembarques", "catch", "catches", "production", "produccion", "tonnes", "toneladas", "whales", "ballenas", "seals", "focas"],
+    "variables": [
+      {"name": "capture_quantity", "unit": "tonnes", "description": "Nominal landings in live weight for aquatic animals and wet weight for aquatic plants."},
+      {"name": "capture_number", "unit": "number of animals", "description": "Whales, seals and crocodiles are reported in numbers rather than tonnes."}
+    ],
+    "dimensions": ["country or area", "ASFIS species item", "FAO major fishing area", "year", "measure", "observation status"],
+    "coverage": {"start_year": 1950, "end_year": 2024, "geography": "Global marine and inland fishing areas", "frequency": "annual"},
+    "access": {"authentication": "none", "method": "Public standalone CSV ZIP and the Global Production FishStatJ workspace; standalone archive retrieval is not implemented in this MCP."},
+    "download_tools": [],
+    "related_access": [
+      {
+        "dataset_id": "fishstat_global_production",
+        "tool": "fishstat_production_by_country",
+        "parameters": {"source": "capture"},
+        "required_arguments": ["query", "year"],
+        "scope": "Country-aggregated capture quantities in tonnes for one selected year through Global Production; query or species_code selects aquatic species. Original fishing-area rows and animal counts are not available through this route."
+      }
+    ],
+    "catalogue_only": true,
+    "limitations": [
+      "This standalone collection has no download tool. The existing fishstat_production_by_country tool can retrieve a country-aggregated quantity subset from Global Production with source=capture.",
+      "Landings exclude discards and are not a measure of all removals from an ecosystem.",
+      "No catch value or ex-vessel price series is promised by this collection.",
+      "Some species are reported under broader species groups; species-specific totals can be incomplete.",
+      "Keep animal counts separate from weight measures."
+    ],
+    "references": ["https://www.fao.org/fishery/static/Data/Capture_2026.1.0.zip", "https://www.fao.org/fishery/static/FishStatJ/FAO_FI_Global_Production_2026.1.0.fws", "https://www.fao.org/statistics/data-collection/fishery-and-aquaculture/en"],
+    "archive_url": "https://www.fao.org/fishery/static/Data/Capture_2026.1.0.zip",
+    "workspace_acronym": "FAO_FI_GLOBAL_PROD",
+    "version": "2026.1.0",
+    "verified_on": "2026-09-28"
+  },
+  {
+    "id": "fishstat_trade",
+    "provider": "fishstat",
+    "title": "FAO Global Aquatic Trade: All Partners Aggregated",
+    "description": "Annual aquatic-product imports, exports and re-exports by reporting country and commodity, with all trading partners combined. Provides merchandise trade quantity and trade value.",
+    "topics": ["trade", "comercio", "imports", "importaciones", "exports", "exportaciones", "re-exports", "reexportaciones", "trade value", "valor", "commodity", "producto", "ISSCFC", "HS", "salmon", "salmones", "seaweed", "algas"],
+    "variables": [
+      {"name": "trade_quantity", "unit": "tonnes of net product weight", "description": "Traded product weight excluding containers and added preservation liquids."},
+      {"name": "trade_value", "unit": "thousands of US dollars", "description": "Monetary import, export or re-export value. Exports generally use FOB and imports CIF valuation; national exceptions apply."}
+    ],
+    "dimensions": ["reporting country or area", "ISSCFC commodity", "trade flow: import, export, re-export", "year", "measure", "observation status"],
+    "coverage": {"start_year": 1976, "end_year": 2024, "geography": "Global reporting countries and areas", "frequency": "annual"},
+    "access": {"authentication": "none", "method": "Public FAO CSV ZIP, FishStatJ trade workspace and official query interfaces; no MCP download connector yet."},
+    "download_tools": [],
+    "catalogue_only": true,
+    "limitations": [
+      "Known provider collection; this MCP cannot yet retrieve its records.",
+      "Use the separate by-partner collection for bilateral flows; this collection combines all partners.",
+      "Trade quantities are net product weight, not the live-weight quantities in primary production collections.",
+      "Trade value describes merchandise crossing borders, not the value of production at farms.",
+      "ISSCFC commodity codes identify products and product forms, not the same units as ASFIS production species codes.",
+      "Import and export values have different valuation bases; a value divided by quantity is a unit value, not a directly observed market price.",
+      "Imputed or mirrored trade observations and historical revisions must be identified with the original flags and release."
+    ],
+    "references": ["https://www.fao.org/fishery/static/Data/FI_Trade_2026.1.0.zip", "https://www.fao.org/fishery/static/FishStatJ/FAO_FI_GLOBAL_TRADE_2026.1.0.fws", "https://www.fao.org/fishery/en/collection/global_commodity_prod"],
+    "archive_url": "https://www.fao.org/fishery/static/Data/FI_Trade_2026.1.0.zip",
+    "workspace_acronym": "FAO_FI_GLOBAL_TRADE",
+    "version": "2026.1.0",
+    "verified_on": "2026-09-28"
+  },
+  {
+    "id": "fishstat_trade_partners",
+    "provider": "fishstat",
+    "title": "FAO Global Aquatic Trade: By Partner Country",
+    "description": "Bilateral annual aquatic-product trade, distinguishing the reporting country from its partner country, the product, and the direction of trade.",
+    "topics": ["trade", "comercio", "bilateral", "partner", "socio", "imports", "importaciones", "exports", "exportaciones", "origin", "origen", "destination", "destino", "trade value", "valor", "ISSCFC", "salmon", "salmones"],
+    "variables": [
+      {"name": "trade_quantity", "unit": "tonnes of net product weight", "description": "Bilateral import, export or re-export quantity, measured as the traded product."},
+      {"name": "trade_value", "unit": "thousands of US dollars", "description": "Bilateral monetary trade value; imports generally CIF, exports and re-exports generally FOB."}
+    ],
+    "dimensions": ["reporting country or area", "partner country or area", "ISSCFC commodity", "trade flow", "year", "measure", "observation status"],
+    "coverage": {"start_year": 2019, "end_year": 2024, "geography": "Global reporting countries and trading partners", "frequency": "annual"},
+    "access": {"authentication": "none", "method": "Public FAO CSV ZIP and FishStatJ trade workspace; no MCP download connector yet."},
+    "download_tools": [],
+    "catalogue_only": true,
+    "limitations": [
+      "Known provider collection; this MCP cannot yet retrieve its records.",
+      "The current bilateral release begins in 2019; the 1976 start date belongs to the all-partners series.",
+      "A reporter's exports need not equal its partner's recorded imports because valuation, timing, classification and reporting can differ.",
+      "Do not add bilateral rows to all-partner totals. Preserve flags for mirrored or imputed records."
+    ],
+    "references": ["https://www.fao.org/fishery/static/Data/FI_Trade_Partners_2026.1.0.zip", "https://www.fao.org/fishery/static/FishStatJ/FAO_FI_GLOBAL_TRADE_2026.1.0.fws", "https://www.fao.org/fishery/en/collection/global_commodity_prod"],
+    "archive_url": "https://www.fao.org/fishery/static/Data/FI_Trade_Partners_2026.1.0.zip",
+    "workspace_acronym": "FAO_FI_GLOBAL_TRADE",
+    "version": "2026.1.0",
+    "verified_on": "2026-09-28"
+  },
+  {
+    "id": "fishstat_processed_production",
+    "provider": "fishstat",
+    "title": "FAO Global Aquatic Processed Production",
+    "description": "Annual output of processed and preserved aquatic-animal products by country and commodity, including frozen, filleted, canned, dried or smoked products, fishmeal and fish oil.",
+    "topics": ["processed production", "procesamiento", "produccion procesada", "preserved", "conservas", "frozen", "congelado", "fillets", "filetes", "fishmeal", "harina de pescado", "fish oil", "aceite de pescado", "canning", "ISSCFC"],
+    "variables": [
+      {"name": "processed_production_quantity", "unit": "tonnes of net product weight", "description": "Weight of the processed output."}
+    ],
+    "dimensions": ["country or area", "ISSCFC commodity", "year", "measure", "observation status"],
+    "coverage": {"start_year": 1976, "end_year": 2024, "geography": "Reporting countries and areas worldwide; incomplete coverage", "frequency": "annual"},
+    "access": {"authentication": "none", "method": "Public FAO CSV ZIP and a separate FishStatJ processed-production workspace; no MCP download connector yet."},
+    "download_tools": [],
+    "catalogue_only": true,
+    "limitations": [
+      "Known provider collection; this MCP cannot yet retrieve its records.",
+      "This is processed output, not primary capture or aquaculture harvest. Inputs can include imported raw material.",
+      "The reported output weight is not the live-weight input required to manufacture it.",
+      "Unprocessed whole fresh fish and live products are excluded. Aquatic plants and products from mammals, frogs and crocodiles are outside this collection's scope.",
+      "Do not add processed output to primary production totals; this can double-count the same biological production.",
+      "The collection provides quantities; a monetary processed-production series is not promised. Retain imputation and missing-value flags."
+    ],
+    "references": ["https://www.fao.org/fishery/static/Data/FI_Trade_PP_2026.1.0.zip", "https://www.fao.org/fishery/static/FishStatJ/FAO_FI_GLOBAL_PP_2026.1.0.fws", "https://www.fao.org/fishery/en/collection/global_pp"],
+    "archive_url": "https://www.fao.org/fishery/static/Data/FI_Trade_PP_2026.1.0.zip",
+    "workspace_acronym": "FAO_FI_GLOBAL_PP",
+    "version": "2026.1.0",
+    "verified_on": "2026-09-28"
+  },
+  {
+    "id": "fishstat_food_balances",
+    "provider": "fishstat",
+    "title": "FAO Food Balance Sheets of Aquatic Products",
+    "description": "National supply and utilization accounts for aquatic-animal foods, including food availability, production, trade, non-food use, stock variation, population and nutrient availability. Supports finding inputs for apparent-consumption questions.",
+    "topics": ["food balance", "food availability", "food supply", "apparent consumption", "consumption", "consumo", "consumo aparente", "balance alimentario", "nutrition", "nutricion", "nutrición", "protein", "proteina", "proteína", "population", "poblacion", "per capita", "seguridad alimentaria"],
+    "variables": [
+      {"name": "supply_and_utilization_quantities", "unit": "tonnes of live-weight equivalent", "description": "Production, food imports and exports, non-food uses, stock variation and food availability."},
+      {"name": "population", "unit": "thousands of people", "description": "Population used as the denominator for per-capita availability calculations."},
+      {"name": "energy_availability", "unit": "million kilocalories", "description": "Food energy available in aquatic products."},
+      {"name": "protein_and_fat_availability", "unit": "tonnes", "description": "Available nutrient quantities. Per-capita nutrient indicators require a separate calculation."}
+    ],
+    "dimensions": ["country or area", "aquatic-food commodity group", "supply/utilization or nutrient element", "year", "measure", "observation status"],
+    "coverage": {"start_year": 1961, "end_year": 2021, "geography": "Countries and areas worldwide", "frequency": "annual", "note": "Verified against the July 2026 FishStat workspace metadata. Do not substitute coverage from the separate FAOSTAT Food Balances domain."},
+    "access": {"authentication": "none", "method": "Public FishStatJ food-balance workspace. No matching current CSV ZIP was listed in the FAO Data directory during this audit; no MCP download connector yet."},
+    "download_tools": [],
+    "catalogue_only": true,
+    "limitations": [
+      "Known provider collection; this MCP cannot yet retrieve its records.",
+      "Food availability is a national balance-sheet estimate and is not actual individual or household consumption.",
+      "Energy availability is not a directly measured dietary intake.",
+      "The source groups aquatic-animal products; it does not provide species-level salmon consumption or seaweed consumption.",
+      "The 2026 metadata says per-capita availability is derived from the supplied totals and population, rather than directly available in this workspace.",
+      "Stock changes, conversions from product to live weight, and estimated source inputs affect comparability."
+    ],
+    "references": ["https://www.fao.org/fishery/static/FishStatJ/FAO_FI_FBS_2026.1.0.fws", "https://www.fao.org/fishery/collection/global_fish_consump/en", "https://www.fao.org/cwp-on-fishery-statistics/handbook/socio-economic-dimension/food-balance-sheets/en/"],
+    "archive_url": "https://www.fao.org/fishery/static/FishStatJ/FAO_FI_FBS_2026.1.0.fws",
+    "workspace_acronym": "FAO_FI_FBS",
+    "version": "2026.1.0",
+    "verified_on": "2026-09-28"
+  },
+  {
+    "id": "fishstat_regional_capture",
+    "provider": "fishstat",
+    "title": "FAO Regional Capture Fisheries Statistics",
+    "description": "Four regional capture datasets provide finer statistical-area detail than global major fishing areas: CECAF, GFCM, Southeast Atlantic and RECOFI.",
+    "topics": ["regional capture", "captura regional", "fishing area", "area de pesca", "statistical division", "CECAF", "GFCM", "Mediterranean", "Mediterraneo", "Mediterráneo", "Black Sea", "Mar Negro", "Eastern Central Atlantic", "Southeast Atlantic", "SEAFO", "SEATL", "RECOFI", "Oman", "Gulf"],
+    "variables": [
+      {"name": "regional_capture_quantity", "unit": "tonnes live weight", "description": "Nominal landed catches by country, species and regional statistical division; measure Q_tlw."}
+    ],
+    "dimensions": ["regional dataset", "country or area", "ASFIS species item", "regional statistical division", "year", "measure", "observation status"],
+    "coverage": {"start_year": 1970, "end_year": 2024, "geography": "Selected regional fishing areas, listed under subdatasets", "frequency": "annual", "note": "Start years differ by regional dataset; these are not four independent additions to global capture production."},
+    "subdatasets": [
+      {"id": "cecaf", "title": "CECAF: Eastern Central Atlantic", "start_year": 1970, "end_year": 2024, "geography": "FAO area 34 and its statistical divisions", "data_file": "CECAF_Capture_Quantity.csv"},
+      {"id": "gfcm", "title": "GFCM: Mediterranean and Black Sea", "start_year": 1970, "end_year": 2024, "geography": "FAO area 37 and its statistical divisions", "data_file": "GFCM_Capture_Quantity.csv"},
+      {"id": "seatl", "title": "Southeast Atlantic", "start_year": 1975, "end_year": 2024, "geography": "FAO area 47 and SEAFO statistical divisions", "data_file": "SEATL_Capture_Quantity.csv"},
+      {"id": "recofi", "title": "RECOFI: Part of the Western Indian Ocean", "start_year": 1986, "end_year": 2024, "geography": "Gulf and Oman Sea; Oman catches from the southwestern Arabian Sea are included from 2018", "data_file": "RECOFI_Capture_Quantity.csv"}
+    ],
+    "access": {"authentication": "none", "method": "Public FAO regional CSV ZIP and FishStatJ regional workspace; no MCP download connector yet."},
+    "download_tools": [],
+    "catalogue_only": true,
+    "limitations": [
+      "Known provider collection; this MCP cannot yet retrieve its records.",
+      "Capture excludes aquaculture and discards. The four datasets exclude marine mammals and seaweeds; other exclusions vary by dataset.",
+      "Some species and statistical divisions are unspecified or grouped; tuna catches may be assigned to a separate regional tuna division.",
+      "Regional and global capture releases may differ because updates occur at different times. Do not sum overlapping datasets.",
+      "Regional statistical boundaries and reporting practices can change; consult the notes for the selected dataset and country."
+    ],
+    "references": ["https://www.fao.org/fishery/static/Data/FI_Regional_2026.1.0.zip", "https://www.fao.org/fishery/static/FishStatJ/FAO_FI_REGIONAL_2026.1.0.fws", "https://www.fao.org/statistics/data-collection/fishery-and-aquaculture/en"],
+    "archive_url": "https://www.fao.org/fishery/static/Data/FI_Regional_2026.1.0.zip",
+    "workspace_acronym": "FAO_FI_REGIONAL",
+    "version": "2026.1.0",
+    "verified_on": "2026-09-28"
+  },
+  {
+    "id": "fishstat_border_rejections",
+    "provider": "fishstat",
+    "title": "FAO Import Notifications for Fisheries and Aquaculture Products",
+    "description": "Counts of seafood import notifications, including rejections, detentions, recalls and notified issues, classified by importing and exporting area, product and cause. Distributed in the FishStatJ Border Rejections workspace.",
+    "topics": ["border rejections", "rechazos", "import notifications", "notificaciones", "food safety", "inocuidad", "hazard", "peligro", "parasites", "parasitos", "parásitos", "chemical", "quimico", "histamine", "histamina", "trade", "comercio", "recall"],
+    "variables": [
+      {"name": "notification_count", "unit": "number of import notifications", "description": "Measure Q_no_1 counts import notifications."}
+    ],
+    "dimensions": ["importing country or area", "exporting country or area", "product", "cause and hazard category", "month", "year", "measure", "observation status"],
+    "coverage": {"start_year": 2016, "end_year": 2025, "geography": "Import notifications reported by Australia, China, the European Union, Japan, the United Kingdom and the United States; availability varies by portal", "frequency": "monthly", "note": "2016–2025 is the observed PERIOD range in the 2026.1.0 CSV; it does not imply complete coverage for every market or month."},
+    "access": {"authentication": "none", "method": "Public FAO CSV ZIP and FishStatJ Border Rejections workspace; no MCP download connector yet."},
+    "download_tools": [],
+    "catalogue_only": true,
+    "limitations": [
+      "Known provider collection; this MCP cannot yet retrieve its records.",
+      "Notification systems and reporting practices differ by importing market, so counts are not directly comparable risk rates.",
+      "Counts are not tonnes or the prevalence of contaminated products.",
+      "Product labels are taken from notification portals and do not follow the ASFIS species classification.",
+      "Parasite-related border notifications are not farm-level salmon lice monitoring; use BarentsWatch for that separate research need.",
+      "The dataset does not provide the total number of inspected consignments as a denominator for rejection rates."
+    ],
+    "references": ["https://www.fao.org/fishery/static/Data/BorderRejections_2026.1.0.zip", "https://www.fao.org/fishery/static/FishStatJ/FAO_FI_Border_Rejections_2026.1.0.fws", "https://www.fao.org/in-action/globefish/markets---trade/import-notifications-for-fisheries-and-aquaculture-products/en"],
+    "archive_url": "https://www.fao.org/fishery/static/Data/BorderRejections_2026.1.0.zip",
+    "workspace_acronym": "FAO_FI_REJECTION",
+    "version": "2026.1.0",
+    "verified_on": "2026-09-28"
+  },
+  {
+    "id": "fishstat_employment",
+    "provider": "fishstat",
+    "title": "FAO Global Employment in the Primary Sector of Fisheries and Aquaculture",
+    "description": "Annual numbers of fishers and fish farmers by country, work domain, working-time category and gender. First disseminated as a FishStat dataset in 2026.",
+    "topics": ["employment", "empleo", "workers", "trabajadores", "fishers", "pescadores", "fish farmers", "acuicultores", "labor", "labour", "gender", "genero", "género", "women", "mujeres", "full time", "part time", "working time", "aquaculture", "acuicultura"],
+    "variables": [
+      {"name": "employment_number", "unit": "number of people", "description": "Measure Q_no_1 in EMPLOY_NUMBER.csv."}
+    ],
+    "dimensions": ["country or area", "work domain", "working-time status", "gender", "year", "measure", "observation status"],
+    "coverage": {"start_year": 1995, "end_year": 2024, "geography": "Countries and territories worldwide", "frequency": "annual", "note": "Working-time categories include full time, part time, occasional and unspecified. Gender includes female, male and unknown."},
+    "access": {"authentication": "none", "method": "Public FAO employment CSV ZIP and FishStatJ employment workspace; no MCP download connector yet."},
+    "download_tools": [],
+    "catalogue_only": true,
+    "limitations": [
+      "Known provider collection; this MCP cannot yet retrieve its records.",
+      "This is employment in capture fisheries and aquaculture, not a complete employment series for the seafood value chain.",
+      "The measure is people, not full-time-equivalent employment, hours or wages.",
+      "Although the shared work-area code list contains Processing and Subsistence, the release metadata says those domains are not published because global coverage is limited.",
+      "Unspecified work domain, working time and gender are substantive categories; excluding them can undercount employment.",
+      "Totals and component categories must not be summed together. Retain imputation flags and consult country notes."
+    ],
+    "references": ["https://www.fao.org/fishery/static/Data/FI_Employment_2026.1.0.zip", "https://www.fao.org/fishery/static/FishStatJ/FAO_FI_EMPLOY_2026.1.0.fws", "https://www.fao.org/statistics/events/events-detail/global-employment-in-fisheries-and-aquaculture.-september-2026-update/en"],
+    "archive_url": "https://www.fao.org/fishery/static/Data/FI_Employment_2026.1.0.zip",
+    "workspace_acronym": "FAO_FI_EMPLOY",
+    "version": "2026.1.0",
+    "verified_on": "2026-09-28"
+  }
+]

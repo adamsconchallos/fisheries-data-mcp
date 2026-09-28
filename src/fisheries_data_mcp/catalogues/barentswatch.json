@@ -1,0 +1,6971 @@
+[
+  {
+    "id": "barentswatch_localities",
+    "provider": "barentswatch",
+    "title": "Aquaculture locality directory",
+    "description": "Find site identifiers by name or number before retrieving locality data. The current directory includes sites for multiple licensed species.",
+    "topics": [
+      "locality",
+      "site",
+      "farm",
+      "centro",
+      "localidad",
+      "Norway",
+      "Noruega",
+      "salmon",
+      "salmón"
+    ],
+    "variables": [
+      {
+        "name": "localityNo",
+        "unit": "identifier",
+        "description": "Site identifier needed by data tools."
+      },
+      {
+        "name": "name",
+        "unit": "text",
+        "description": "Site name."
+      },
+      {
+        "name": "municipality",
+        "unit": "text",
+        "description": "Municipality name and number are returned by the current directory."
+      }
+    ],
+    "dimensions": [
+      "locality",
+      "municipality"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Current directory; a separate endpoint lists names of sites that have held salmonoid licenses."
+    },
+    "access": {
+      "authentication": "BarentsWatch API client credentials; OAuth2 scope api.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [
+      "barentswatch_search_localities"
+    ],
+    "limitations": [
+      "Search matches site names or IDs, not municipality names.",
+      "Directory membership is not evidence that a site was active or reported in a historical year.",
+      "The separate historical salmonoid-license name endpoint is catalogued but not wrapped."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/fishhealth/openapi.json",
+      "https://developer.barentswatch.no/docs/fishhealth/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/localities",
+        "tags": [
+          "FishHealthLocality"
+        ],
+        "deprecated": false,
+        "available_in_mcp": true,
+        "parameters": [
+          {
+            "name": "query",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/localitieswithsalmonoids",
+        "tags": [
+          "FishHealthLocality"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      }
+    ],
+    "invocation_hints": {
+      "tool": "barentswatch_search_localities",
+      "example_arguments": {
+        "query": "Varden",
+        "limit": 50
+      }
+    }
+  },
+  {
+    "id": "barentswatch_lice_stages",
+    "provider": "barentswatch",
+    "title": "Weekly sea-lice counts and reporting flags",
+    "description": "Site reports of adult female, mobile and stationary salmon lice. Use reporting flags to distinguish absent reports from observed zeroes.",
+    "topics": [
+      "lice",
+      "sea lice",
+      "salmon lice",
+      "piojos",
+      "piojo",
+      "parásitos",
+      "parasitos",
+      "lakselus",
+      "salmon",
+      "salmón",
+      "Norway",
+      "Noruega"
+    ],
+    "variables": [
+      {
+        "name": "avgAdultFemaleLice",
+        "unit": "lice per fish",
+        "description": "Provider weekly mean of adult females."
+      },
+      {
+        "name": "avgMobileLice",
+        "unit": "lice per fish",
+        "description": "Provider weekly mean of mobile stages."
+      },
+      {
+        "name": "avgStationaryLice",
+        "unit": "lice per fish",
+        "description": "Provider weekly mean of stationary stages."
+      },
+      {
+        "name": "hasReportedLice",
+        "unit": "boolean",
+        "description": "False means accompanying zeroes must not be treated as observed zero lice."
+      }
+    ],
+    "dimensions": [
+      "locality",
+      "ISO year",
+      "ISO week"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Dataset-specific; Fish Health includes historical data from 2012, with field-specific changes."
+    },
+    "access": {
+      "authentication": "BarentsWatch API client credentials; OAuth2 scope api.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [
+      "barentswatch_get_locality_data",
+      "barentswatch_lice_by_locality"
+    ],
+    "limitations": [
+      "Use dataset=lice_stages for stage counts and reporting flags.",
+      "The older adult-female-only tool lacks the richer reporting flag.",
+      "National annual averages require an explicit weighting rule and are not calculated by this MCP.",
+      "Reports can contain source errors."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/fishhealth/openapi.json",
+      "https://developer.barentswatch.no/docs/fishhealth/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/locality/{localityNo}/avgfemalelice/{year}",
+        "tags": [
+          "FishHealthLocality"
+        ],
+        "deprecated": false,
+        "available_in_mcp": true,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/locality/{localityNo}/liceTypeDistribution/{year}",
+        "tags": [
+          "FishHealthLocality"
+        ],
+        "deprecated": false,
+        "available_in_mcp": true,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          }
+        ]
+      }
+    ],
+    "invocation_hints": {
+      "tool": "barentswatch_get_locality_data",
+      "fixed_arguments": {
+        "dataset": "lice_stages"
+      },
+      "required_arguments": [
+        "locality_id",
+        "year"
+      ]
+    }
+  },
+  {
+    "id": "barentswatch_sea_temperature",
+    "provider": "barentswatch",
+    "title": "Weekly water temperature at aquaculture sites",
+    "description": "Reported temperature at or near a fish farm with a reporting-status flag.",
+    "topics": [
+      "temperature",
+      "water",
+      "sea",
+      "temperatura",
+      "agua",
+      "environment",
+      "ambiente",
+      "salmon",
+      "Norway",
+      "Noruega"
+    ],
+    "variables": [
+      {
+        "name": "seaTemperature",
+        "unit": "degrees Celsius",
+        "description": "Reported weekly site water temperature."
+      },
+      {
+        "name": "hasReported",
+        "unit": "boolean",
+        "description": "Whether a measurement was reported for the week."
+      }
+    ],
+    "dimensions": [
+      "locality",
+      "ISO year",
+      "ISO week"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Dataset-specific; Fish Health includes historical data from 2012, with field-specific changes."
+    },
+    "access": {
+      "authentication": "BarentsWatch API client credentials; OAuth2 scope api.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [
+      "barentswatch_get_locality_data"
+    ],
+    "limitations": [
+      "Use dataset=sea_temperature.",
+      "Unreported and future weeks can have null temperatures; no interpolation is performed."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/fishhealth/openapi.json",
+      "https://developer.barentswatch.no/docs/fishhealth/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/locality/{localityNo}/seatemperature/{year}",
+        "tags": [
+          "FishHealthLocality"
+        ],
+        "deprecated": false,
+        "available_in_mcp": true,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          }
+        ]
+      }
+    ],
+    "invocation_hints": {
+      "tool": "barentswatch_get_locality_data",
+      "fixed_arguments": {
+        "dataset": "sea_temperature"
+      },
+      "required_arguments": [
+        "locality_id",
+        "year"
+      ]
+    }
+  },
+  {
+    "id": "barentswatch_treatments",
+    "provider": "barentswatch",
+    "title": "Sea-lice treatments",
+    "description": "Reported medicinal, non-medicinal, mechanical and combination interventions, with historical cleaner-fish records where available.",
+    "topics": [
+      "treatment",
+      "tratamiento",
+      "medication",
+      "medicamentos",
+      "lice",
+      "piojos",
+      "cleaner fish",
+      "peces limpiadores",
+      "salmon",
+      "Norway",
+      "Noruega"
+    ],
+    "variables": [
+      {
+        "name": "medicinalTreatments",
+        "unit": "nested records",
+        "description": "Treatment substance and method where supplied."
+      },
+      {
+        "name": "nonMedicinalTreatments",
+        "unit": "nested records",
+        "description": "Provider non-medicinal treatment records."
+      },
+      {
+        "name": "combinationTreatments",
+        "unit": "nested records",
+        "description": "Combined treatment records."
+      },
+      {
+        "name": "mechanicalRemoval",
+        "unit": "boolean",
+        "description": "Provider mechanical-removal flag."
+      }
+    ],
+    "dimensions": [
+      "locality",
+      "ISO year",
+      "ISO week",
+      "treatment"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Dataset-specific; Fish Health includes historical data from 2012, with field-specific changes."
+    },
+    "access": {
+      "authentication": "BarentsWatch API client credentials; OAuth2 scope api.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [
+      "barentswatch_get_locality_data"
+    ],
+    "limitations": [
+      "Use dataset=treatments. Treatment lists remain nested; the MCP does not estimate doses or treatment counts.",
+      "Cleaner-fish reporting is not included after week 16 of 2018.",
+      "Fields can vary by provider record version."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/fishhealth/openapi.json",
+      "https://developer.barentswatch.no/docs/fishhealth/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/locality/{localityNo}/liceMedicationEvents/{year}",
+        "tags": [
+          "FishHealthLocality"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/locality/{localityNo}/liceTreatments/{year}",
+        "tags": [
+          "FishHealthLocality"
+        ],
+        "deprecated": false,
+        "available_in_mcp": true,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          }
+        ]
+      }
+    ],
+    "invocation_hints": {
+      "tool": "barentswatch_get_locality_data",
+      "fixed_arguments": {
+        "dataset": "treatments"
+      },
+      "required_arguments": [
+        "locality_id",
+        "year"
+      ]
+    }
+  },
+  {
+    "id": "barentswatch_diseases",
+    "provider": "barentswatch",
+    "title": "Aquaculture disease cases",
+    "description": "Disease case records and their suspicion, diagnosis, emptying and closure dates, including ISA and pancreas disease where recorded.",
+    "topics": [
+      "disease",
+      "enfermedad",
+      "ISA",
+      "ILA",
+      "PD",
+      "pancreas",
+      "páncreas",
+      "salmon",
+      "Norway",
+      "Noruega"
+    ],
+    "variables": [
+      {
+        "name": "name",
+        "unit": "text",
+        "description": "Provider disease name."
+      },
+      {
+        "name": "status",
+        "unit": "category",
+        "description": "Case status."
+      },
+      {
+        "name": "diagnosisDate",
+        "unit": "datetime",
+        "description": "Diagnosis date if supplied."
+      },
+      {
+        "name": "closureDate",
+        "unit": "datetime",
+        "description": "Case closure date if supplied."
+      }
+    ],
+    "dimensions": [
+      "locality",
+      "requested year",
+      "disease case"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Dataset-specific; Fish Health includes historical data from 2012, with field-specific changes."
+    },
+    "access": {
+      "authentication": "BarentsWatch API client credentials; OAuth2 scope api.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [
+      "barentswatch_get_locality_data"
+    ],
+    "limitations": [
+      "Use dataset=diseases.",
+      "A case returned for one year may have started in an earlier year; this is not a count of new cases.",
+      "The connector uses version 3; legacy and all-years endpoints are only catalogued."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/fishhealth/openapi.json",
+      "https://developer.barentswatch.no/docs/fishhealth/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/locality/{localityNo}/disease/{year}",
+        "tags": [
+          "FishHealthLocality"
+        ],
+        "deprecated": true,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v2/geodata/fishhealth/locality/{localityNo}/disease/{year}",
+        "tags": [
+          "FishHealthLocality"
+        ],
+        "deprecated": true,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v3/geodata/fishhealth/locality/{localityNo}/disease/{year}",
+        "tags": [
+          "FishHealthLocality"
+        ],
+        "deprecated": false,
+        "available_in_mcp": true,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v3/geodata/fishhealth/locality/{localityNo}/disease",
+        "tags": [
+          "FishHealthLocality"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          }
+        ]
+      }
+    ],
+    "invocation_hints": {
+      "tool": "barentswatch_get_locality_data",
+      "fixed_arguments": {
+        "dataset": "diseases"
+      },
+      "required_arguments": [
+        "locality_id",
+        "year"
+      ]
+    }
+  },
+  {
+    "id": "barentswatch_escapes",
+    "provider": "barentswatch",
+    "title": "Farmed-fish escape incidents",
+    "description": "Reported escape events returned in weekly groups for a selected locality and year.",
+    "topics": [
+      "escape",
+      "escapes",
+      "escapement",
+      "fuga",
+      "fugas",
+      "salmon",
+      "salmones",
+      "Norway",
+      "Noruega"
+    ],
+    "variables": [
+      {
+        "name": "escapes",
+        "unit": "nested records",
+        "description": "Provider escape-event details, retained as supplied."
+      }
+    ],
+    "dimensions": [
+      "locality",
+      "ISO year",
+      "ISO week",
+      "escape event"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Dataset-specific; Fish Health includes historical data from 2012, with field-specific changes."
+    },
+    "access": {
+      "authentication": "BarentsWatch API client credentials; OAuth2 scope api.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [
+      "barentswatch_get_locality_data"
+    ],
+    "limitations": [
+      "Use dataset=escapes.",
+      "Empty event lists are returned without inventing zero-event weeks. Reported escapes do not directly measure effects on wild stocks."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/fishhealth/openapi.json",
+      "https://developer.barentswatch.no/docs/fishhealth/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/locality/{localityNo}/escape/{year}",
+        "tags": [
+          "FishHealthLocality"
+        ],
+        "deprecated": false,
+        "available_in_mcp": true,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          }
+        ]
+      }
+    ],
+    "invocation_hints": {
+      "tool": "barentswatch_get_locality_data",
+      "fixed_arguments": {
+        "dataset": "escapes"
+      },
+      "required_arguments": [
+        "locality_id",
+        "year"
+      ]
+    }
+  },
+  {
+    "id": "barentswatch_capacity",
+    "provider": "barentswatch",
+    "title": "Permitted aquaculture site capacity",
+    "description": "Weekly permitted capacity of an aquaculture site under its administrative authorization.",
+    "topics": [
+      "capacity",
+      "capacidad",
+      "permit",
+      "licencia",
+      "salmon",
+      "Norway",
+      "Noruega"
+    ],
+    "variables": [
+      {
+        "name": "capacity",
+        "unit": "provider unit; inspect site snapshot",
+        "description": "Permitted site capacity for the reporting week."
+      }
+    ],
+    "dimensions": [
+      "locality",
+      "ISO year",
+      "ISO week"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Dataset-specific; Fish Health includes historical data from 2012, with field-specific changes."
+    },
+    "access": {
+      "authentication": "BarentsWatch API client credentials; OAuth2 scope api.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [
+      "barentswatch_get_locality_data"
+    ],
+    "limitations": [
+      "Use dataset=capacity.",
+      "The capacity endpoint omits its unit. Inspect aquaCultureRegister.unit in a site snapshot before using the value.",
+      "Do not substitute capacity for annual production, harvests or actual standing biomass."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/fishhealth/openapi.json",
+      "https://developer.barentswatch.no/docs/fishhealth/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/locality/{localityNo}/capacity/{year}",
+        "tags": [
+          "FishHealthLocality"
+        ],
+        "deprecated": false,
+        "available_in_mcp": true,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          }
+        ]
+      }
+    ],
+    "invocation_hints": {
+      "tool": "barentswatch_get_locality_data",
+      "fixed_arguments": {
+        "dataset": "capacity"
+      },
+      "required_arguments": [
+        "locality_id",
+        "year"
+      ]
+    }
+  },
+  {
+    "id": "barentswatch_locality_details",
+    "provider": "barentswatch",
+    "title": "Aquaculture site and health snapshot",
+    "description": "Nested weekly site record combining coordinates, license information, authorized species, capacity units, disease, lice, temperature and treatment fields.",
+    "topics": [
+      "locality",
+      "farm",
+      "license",
+      "species",
+      "especies",
+      "licencias",
+      "coordinates",
+      "coordenadas",
+      "fallow",
+      "barbecho",
+      "salmon",
+      "Norway",
+      "Noruega"
+    ],
+    "variables": [
+      {
+        "name": "geometry",
+        "unit": "GeoJSON longitude, latitude",
+        "description": "Site position."
+      },
+      {
+        "name": "aquaCultureRegister",
+        "unit": "nested object",
+        "description": "Licenses, capacity unit, organizations and authorized species."
+      },
+      {
+        "name": "liceReport",
+        "unit": "nested object",
+        "description": "Counts, temperature, hasReported and isFallow flags."
+      },
+      {
+        "name": "diseases",
+        "unit": "nested records",
+        "description": "Disease cases relevant to the snapshot."
+      }
+    ],
+    "dimensions": [
+      "locality",
+      "ISO year",
+      "ISO week"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Dataset-specific; Fish Health includes historical data from 2012, with field-specific changes."
+    },
+    "access": {
+      "authentication": "BarentsWatch API client credentials; OAuth2 scope api.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [
+      "barentswatch_get_locality_details"
+    ],
+    "limitations": [
+      "Licensed species do not prove that those species were actually present.",
+      "This snapshot is exported as nested JSON; no cross-source join is done.",
+      "Historical interpretation requires attention to provider reporting changes."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/fishhealth/openapi.json",
+      "https://developer.barentswatch.no/docs/fishhealth/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/locality/{localityNo}/{year}/{week}",
+        "tags": [
+          "FishHealthLocality"
+        ],
+        "deprecated": true,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v2/geodata/fishhealth/locality/{localityNo}/{year}/{week}",
+        "tags": [
+          "FishHealthLocality"
+        ],
+        "deprecated": false,
+        "available_in_mcp": true,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      }
+    ],
+    "invocation_hints": {
+      "tool": "barentswatch_get_locality_details",
+      "required_arguments": [
+        "locality_id",
+        "year",
+        "week"
+      ]
+    }
+  },
+  {
+    "id": "barentswatch_lice_limit_statistics",
+    "provider": "barentswatch",
+    "title": "Provider summaries of sites above lice thresholds",
+    "description": "Counts and proportions of sites above the general lice threshold by week, year or current county, calculated by the data provider.",
+    "topics": [
+      "lice",
+      "piojos",
+      "annual",
+      "anual",
+      "national",
+      "nacional",
+      "threshold",
+      "limite",
+      "límite",
+      "Norway",
+      "Noruega"
+    ],
+    "variables": [
+      {
+        "name": "weightedAverageLocalitiesOverLimit",
+        "unit": "sites",
+        "description": "Provider weighted annual site-count statistic."
+      },
+      {
+        "name": "averageProportionOfLocalitiesOverLimit",
+        "unit": "proportion",
+        "description": "Provider annual proportion above the threshold."
+      }
+    ],
+    "dimensions": [
+      "year",
+      "week",
+      "current county"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Dataset-specific; Fish Health includes historical data from 2012, with field-specific changes."
+    },
+    "access": {
+      "authentication": "BarentsWatch API client credentials; OAuth2 scope api.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [],
+    "limitations": [
+      "Catalogue only: the current MCP does not download these summaries.",
+      "These are threshold exceedance measures, not national mean lice per fish.",
+      "Regional grouping uses current counties. Special regulatory exemptions may not be represented."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/fishhealth/openapi.json",
+      "https://developer.barentswatch.no/docs/fishhealth/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/localitiesoverlimitbyweek",
+        "tags": [
+          "FishHealthLocality"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "startYear",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "endYear",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/localitiesoverlimitbyyear",
+        "tags": [
+          "FishHealthLocality"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "startYear",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "endYear",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/localitiesoverlimitbyyearandregion",
+        "tags": [
+          "FishHealthLocality"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "startYear",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "endYear",
+            "location": "query",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "barentswatch_weekly_overview",
+    "provider": "barentswatch",
+    "title": "National and multi-site weekly health overview",
+    "description": "Provider weekly overview endpoints summarize or list sites with health and lice-report information.",
+    "topics": [
+      "national",
+      "nacional",
+      "overview",
+      "resumen",
+      "salmon",
+      "lice",
+      "piojos",
+      "Norway",
+      "Noruega"
+    ],
+    "variables": [
+      {
+        "name": "site health summary",
+        "unit": "provider fields",
+        "description": "Weekly overview fields; inspect the operation response schema."
+      }
+    ],
+    "dimensions": [
+      "locality",
+      "ISO year",
+      "ISO week"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Dataset-specific; Fish Health includes historical data from 2012, with field-specific changes."
+    },
+    "access": {
+      "authentication": "BarentsWatch API client credentials; OAuth2 scope api.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [],
+    "limitations": [
+      "Catalogue only: multi-site summary endpoints are not yet wrapped.",
+      "A national overview is not a production-weighted national annual lice indicator."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/fishhealth/openapi.json",
+      "https://developer.barentswatch.no/docs/fishhealth/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/{year}/{week}",
+        "tags": [
+          "FishHealthLocality"
+        ],
+        "deprecated": true,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "Ila",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "IlaConfirmed",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "IlaSuspected",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "Pd",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "PdConfirmed",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "PdSuspected",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "AllWithReport",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "AllWithoutReport",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "AllFallowWithoutReport",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "AllReportNotMandatoryWithoutReport",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "AllNotFallowWithoutReport",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "AboveLiceThreshold",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "BelowLiceThreshold",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "AboveMinimumLiceThreshold",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "BelowMinimumLiceThreshold",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "MinLiceUserThreshold",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "MaxLiceUserThreshold",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "Organization",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "HasSubstanceTreatments",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "Substance",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "SubstanceOtherInFeed",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "SubstanceOtherBath",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "ProductionType",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "Purpose",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "AnyGreen",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "CountyMunicipality",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "CleanerFish",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "Species",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "MechanicalRemoval",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "InsideIlaControlArea",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "ProductionArea",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "ShrimpFishingGroundProximity",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "ShrimpfishinggroundOrCodspawninggroundProximity",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "IsOnLand",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "OnlyWithSalmonoidLicense",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "LicenseSpecies",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "WithinPolygon",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "NonMedicinalTreatmentType",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/locality/{year}/{week}",
+        "tags": [
+          "FishHealthLocality"
+        ],
+        "deprecated": true,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "TagFilteredLocalities",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "Ila",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "IlaConfirmed",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "IlaSuspected",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "Pd",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "PdConfirmed",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "PdSuspected",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "AllWithReport",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "AllWithoutReport",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "AllFallowWithoutReport",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "AllReportNotMandatoryWithoutReport",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "AllNotFallowWithoutReport",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "AboveLiceThreshold",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "BelowLiceThreshold",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "AboveMinimumLiceThreshold",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "BelowMinimumLiceThreshold",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "MinLiceUserThreshold",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "MaxLiceUserThreshold",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "Organization",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "HasSubstanceTreatments",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "Substance",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "SubstanceOtherInFeed",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "SubstanceOtherBath",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "ProductionType",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "Purpose",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "AnyGreen",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "CountyMunicipality",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "CleanerFish",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "Species",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "MechanicalRemoval",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "InsideIlaControlArea",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "ProductionArea",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "ShrimpFishingGroundProximity",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "ShrimpfishinggroundOrCodspawninggroundProximity",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "IsOnLand",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "OnlyWithSalmonoidLicense",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "LicenseSpecies",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "WithinPolygon",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "NonMedicinalTreatmentType",
+            "location": "query",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "barentswatch_aquaculture_register",
+    "provider": "barentswatch",
+    "title": "Licensed species and license holders",
+    "description": "Reference lists for species in the aquaculture register and organizations holding aquaculture licenses.",
+    "topics": [
+      "species",
+      "especies",
+      "licensee",
+      "licenciatario",
+      "company",
+      "empresa",
+      "organization",
+      "organizacion",
+      "Norway",
+      "Noruega"
+    ],
+    "variables": [
+      {
+        "name": "species",
+        "unit": "registry labels",
+        "description": "Species represented in the aquaculture register."
+      },
+      {
+        "name": "licensee",
+        "unit": "organization records",
+        "description": "Organizations holding aquaculture licenses."
+      }
+    ],
+    "dimensions": [
+      "species",
+      "organization"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Dataset-specific; Fish Health includes historical data from 2012, with field-specific changes."
+    },
+    "access": {
+      "authentication": "BarentsWatch API client credentials; OAuth2 scope api.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [],
+    "limitations": [
+      "Catalogue only: dedicated reference-list endpoints are not yet wrapped.",
+      "License species do not indicate actual production volumes."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/fishhealth/openapi.json",
+      "https://developer.barentswatch.no/docs/fishhealth/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/licenseelist",
+        "tags": [
+          "AquaCultureLists"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/species",
+        "tags": [
+          "AquaCultureLists"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      }
+    ]
+  },
+  {
+    "id": "barentswatch_bulk_fishhealth_export",
+    "provider": "barentswatch",
+    "title": "Bulk Fish Health CSV and spreadsheet exports",
+    "description": "Provider count, preview and file-download endpoints for filtered health records from sites with salmonoid licenses.",
+    "topics": [
+      "bulk",
+      "CSV",
+      "Excel",
+      "download",
+      "descarga",
+      "salmon",
+      "lice",
+      "piojos",
+      "Norway",
+      "Noruega"
+    ],
+    "variables": [
+      {
+        "name": "health export fields",
+        "unit": "mixed",
+        "description": "Columns and filters are defined by the provider export endpoint."
+      }
+    ],
+    "dimensions": [
+      "locality",
+      "ISO year",
+      "ISO week"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Dataset-specific; Fish Health includes historical data from 2012, with field-specific changes."
+    },
+    "access": {
+      "authentication": "BarentsWatch API client credentials; OAuth2 scope api.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [],
+    "limitations": [
+      "Catalogue only: the MCP currently retrieves one site-year at a time rather than invoking this bulk exporter.",
+      "Provider asks bulk-download clients to use one thread, without parallel requests.",
+      "Cleaner-fish records stop after week 16 of 2018."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/fishhealth/openapi.json",
+      "https://developer.barentswatch.no/docs/fishhealth/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/fishhealth",
+        "tags": [
+          "FishhealthDownload"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "reporttype",
+            "location": "query",
+            "required": true
+          },
+          {
+            "name": "filetype",
+            "location": "query",
+            "required": true
+          },
+          {
+            "name": "localityno",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "fromweek",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "fromyear",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "toweek",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "toyear",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/fishhealth/count",
+        "tags": [
+          "FishhealthDownload"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "reporttype",
+            "location": "query",
+            "required": true
+          },
+          {
+            "name": "localityno",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "fromweek",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "fromyear",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "toweek",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "toyear",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/fishhealth/preview",
+        "tags": [
+          "FishhealthDownload"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "reporttype",
+            "location": "query",
+            "required": true
+          },
+          {
+            "name": "localityno",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "fromweek",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "fromyear",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "toweek",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "toyear",
+            "location": "query",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "barentswatch_disease_and_treatment_zones",
+    "provider": "barentswatch",
+    "title": "Disease controls, export restrictions and treatment zones",
+    "description": "Spatial and historical controls for ISA/PD, export restrictions and areas with medicinal-treatment prohibitions.",
+    "topics": [
+      "zone",
+      "zona",
+      "ISA",
+      "ILA",
+      "PD",
+      "disease",
+      "enfermedad",
+      "restriction",
+      "restriccion",
+      "export",
+      "exportacion",
+      "treatment",
+      "tratamiento",
+      "Norway",
+      "Noruega"
+    ],
+    "variables": [
+      {
+        "name": "zone geometry",
+        "unit": "geospatial",
+        "description": "Boundaries and identifiers."
+      },
+      {
+        "name": "zone history",
+        "unit": "dated records",
+        "description": "Site control-zone history and period-specific restrictions."
+      }
+    ],
+    "dimensions": [
+      "zone",
+      "locality",
+      "year",
+      "week"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Dataset-specific; Fish Health includes historical data from 2012, with field-specific changes."
+    },
+    "access": {
+      "authentication": "BarentsWatch API client credentials; OAuth2 scope api.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [],
+    "limitations": [
+      "Catalogue only: these endpoints are not wrapped.",
+      "Some zone histories begin after 2012; inspect the first-valid-date endpoints.",
+      "The catalogue does not determine current legal compliance."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/fishhealth/openapi.json",
+      "https://developer.barentswatch.no/docs/fishhealth/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymous-exportrestrictions",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/locality/diseasezonehistory/{localityNo}/{year}/{week}",
+        "tags": [
+          "DiseaseHistory"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/locality/diseasezonehistory/{localityNo}",
+        "tags": [
+          "DiseaseHistory"
+        ],
+        "deprecated": true,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/exportrestrictions/{year}/{week}",
+        "tags": [
+          "ExportRestrictions"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/exportrestrictions/{localityNo}/{year}/{week}",
+        "tags": [
+          "ExportRestrictions"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/forbiddenmedicinalzone-badebehandling/{id}",
+        "tags": [
+          "ForbiddenMedicinalZone"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "id",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/forbiddenmedicinalzone-kitinsyntesehemmere/{id}",
+        "tags": [
+          "ForbiddenMedicinalZone"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "id",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/ilaprotectionzone/{year}/{week}",
+        "tags": [
+          "IlaControlArea"
+        ],
+        "deprecated": true,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v2/geodata/fishhealth/ilaprotectionzone/{year}/{week}",
+        "tags": [
+          "IlaControlArea"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/ilasurveillancezone/{year}/{week}",
+        "tags": [
+          "IlaControlArea"
+        ],
+        "deprecated": true,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v2/geodata/fishhealth/ilasurveillancezone/{year}/{week}",
+        "tags": [
+          "IlaControlArea"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/ilasurveillancezone/{forsknr}/{year}/{week}",
+        "tags": [
+          "IlaControlArea"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "forsknr",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/ilaprotectionzone/{forsknr}/{year}/{week}",
+        "tags": [
+          "IlaControlArea"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "forsknr",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/ilacontrolarea/firstvaliddate",
+        "tags": [
+          "IlaControlArea"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/localityradius/{year}/{week}",
+        "tags": [
+          "LocalityRadius"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/pdprotectionzone/{year}/{week}",
+        "tags": [
+          "PdControlArea"
+        ],
+        "deprecated": true,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v2/geodata/fishhealth/pdprotectionzone/{year}/{week}",
+        "tags": [
+          "PdControlArea"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/pdsurveillancezone/{year}/{week}",
+        "tags": [
+          "PdControlArea"
+        ],
+        "deprecated": true,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v2/geodata/fishhealth/pdsurveillancezone/{year}/{week}",
+        "tags": [
+          "PdControlArea"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/pdsurveillancezone/{forsknr}/{year}/{week}",
+        "tags": [
+          "PdControlArea"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "forsknr",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/pdprotectionzone/{forsknr}/{year}/{week}",
+        "tags": [
+          "PdControlArea"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "forsknr",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/pdcontrolarea/firstvaliddate",
+        "tags": [
+          "PdControlArea"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/pdzone",
+        "tags": [
+          "PdZone"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/exportrestrictions",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousexportrestrictions",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/forbiddenmedicinalzone-badebehandling",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousforbiddenmedicinalzone-badebehandling",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/forbiddenmedicinalzone-kitinsyntesehemmere",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousforbiddenmedicinalzone-kitinsyntesehemmere",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/ilaprotectionzone",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousilaprotectionzone",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/ilasurveillancezone",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousilasurveillancezone",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/localitieswithila",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymouslocalitieswithila",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/localitieswithpd",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymouslocalitieswithpd",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/localityradius",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymouslocalityradius",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/pdprotectionzone",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymouspdprotectionzone",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/pdsurveillancezone",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymouspdsurveillancezone",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/pdzone_borders",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymouspdzone_borders",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "barentswatch_locality_statistics",
+    "provider": "barentswatch",
+    "title": "AquaInfo site statistics and environmental surveys",
+    "description": "Site-level permit capacity, B-type environmental surveys, escapes, area and reported lice/treatment statistics.",
+    "topics": [
+      "AquaInfo",
+      "AkvaInfo",
+      "environmental survey",
+      "benthos",
+      "benthic",
+      "sediment",
+      "sedimento",
+      "MOM",
+      "MOMB",
+      "area",
+      "área",
+      "Norway",
+      "Noruega"
+    ],
+    "variables": [
+      {
+        "name": "environmental survey",
+        "unit": "provider score/category",
+        "description": "B-type survey results."
+      },
+      {
+        "name": "locality area",
+        "unit": "provider area units",
+        "description": "Licensed and real occupied area series."
+      },
+      {
+        "name": "site statistics",
+        "unit": "mixed",
+        "description": "Provider site time series."
+      }
+    ],
+    "dimensions": [
+      "locality",
+      "year"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Dataset-specific; Fish Health includes historical data from 2012, with field-specific changes."
+    },
+    "access": {
+      "authentication": "BarentsWatch API client credentials; OAuth2 scope api.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [],
+    "limitations": [
+      "Catalogue only: these statistics endpoints are distinct from the implemented Fish Health site-year records.",
+      "Coverage and units differ by statistic; actual occupied area is a separate concept from licensed area."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/fishhealth/openapi.json",
+      "https://developer.barentswatch.no/docs/fishhealth/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/geodata/locality/{localityNo}/capacity",
+        "tags": [
+          "LocalityStatistics"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/locality/{localityNo}/momb",
+        "tags": [
+          "LocalityStatistics"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/locality/{localityNo}/farmedfishescapes",
+        "tags": [
+          "LocalityStatistics"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/locality/{localityNo}/localityarea",
+        "tags": [
+          "LocalityStatistics"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/locality/{localityNo}/realareaused",
+        "tags": [
+          "LocalityStatistics"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/locality/{localityNo}/salmonlice",
+        "tags": [
+          "LocalityStatistics"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/locality/{localityNo}/treatment",
+        "tags": [
+          "LocalityStatistics"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "query",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "barentswatch_municipality_registry",
+    "provider": "barentswatch",
+    "title": "AquaInfo municipality registry and aquaculture licenses",
+    "description": "Municipality lookup, weekly municipality context, licensed-species counts, organizations and licenses.",
+    "topics": [
+      "AquaInfo",
+      "municipality",
+      "municipio",
+      "license",
+      "licencia",
+      "species",
+      "especies",
+      "Norway",
+      "Noruega"
+    ],
+    "variables": [
+      {
+        "name": "species license counts",
+        "unit": "licenses or sites",
+        "description": "Different endpoints count licenses or sites; multi-species sites may appear in multiple categories."
+      },
+      {
+        "name": "licenses",
+        "unit": "nested records",
+        "description": "Municipality license records."
+      }
+    ],
+    "dimensions": [
+      "municipality",
+      "year",
+      "week",
+      "species category"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Dataset-specific; Fish Health includes historical data from 2012, with field-specific changes."
+    },
+    "access": {
+      "authentication": "BarentsWatch API client credentials; OAuth2 scope api.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [],
+    "limitations": [
+      "Catalogue only: municipality lookup and license endpoints are not wrapped.",
+      "License counts do not measure production."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/fishhealth/openapi.json",
+      "https://developer.barentswatch.no/docs/fishhealth/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/geodata/municipality/{municipalityNumber}/{year}/{week}",
+        "tags": [
+          "MunicipalityAreaWeek"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "municipalityNumber",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/municipality/speciescount/{municipalityNumber}/{year}/{week}",
+        "tags": [
+          "MunicipalityAreaWeek"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "municipalityNumber",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/municipality/specieslocalitycount/{municipalityNumber}/{year}/{week}",
+        "tags": [
+          "MunicipalityAreaWeek"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "municipalityNumber",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/municipality/organization/{municipalityNumber}/{year}/{week}",
+        "tags": [
+          "MunicipalityAreaWeek"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "municipalityNumber",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/municipality/licenses/{municipalityNumber}/{year}/{week}",
+        "tags": [
+          "MunicipalityAreaWeek"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "municipalityNumber",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/municipalities",
+        "tags": [
+          "MunicipalityAreaWeek"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "query",
+            "location": "query",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "barentswatch_municipality_statistics",
+    "provider": "barentswatch",
+    "title": "AquaInfo municipal aquaculture and environmental statistics",
+    "description": "Municipal series on site counts, capacity, area, lice, treatments, environmental surveys, river catches, escapes, disease sites and Aquaculture Fund payments.",
+    "topics": [
+      "AquaInfo",
+      "municipality",
+      "municipio",
+      "fund",
+      "fondo",
+      "payout",
+      "pagos",
+      "capacity",
+      "capacidad",
+      "river catch",
+      "captura rio",
+      "environment",
+      "ambiente",
+      "Norway",
+      "Noruega"
+    ],
+    "variables": [
+      {
+        "name": "payout",
+        "unit": "provider monetary units",
+        "description": "Aquaculture Fund payments; confirm units from endpoint schema."
+      },
+      {
+        "name": "site count",
+        "unit": "sites",
+        "description": "Aquaculture site counts."
+      },
+      {
+        "name": "capacity",
+        "unit": "provider units",
+        "description": "Permitted capacity by species category."
+      },
+      {
+        "name": "environmental survey",
+        "unit": "provider fields",
+        "description": "Survey statistics and classifications."
+      }
+    ],
+    "dimensions": [
+      "municipality",
+      "year",
+      "species category"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Dataset-specific; Fish Health includes historical data from 2012, with field-specific changes."
+    },
+    "access": {
+      "authentication": "BarentsWatch API client credentials; OAuth2 scope api.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [],
+    "limitations": [
+      "Catalogue only: municipality data downloads are not implemented.",
+      "A small authenticated municipality-capacity response was verified; this does not verify every municipal endpoint.",
+      "Many series start in 2012, payments in 2018, and real occupied area in 2023.",
+      "Employment appears in the AquaInfo service description but was not found as a separate operation in the inspected Fish Health schema."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/fishhealth/openapi.json",
+      "https://developer.barentswatch.no/docs/fishhealth/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/geodata/municipality/{municipalityNumber}/locality/{year}",
+        "tags": [
+          "MunicipalityStatistics"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "municipalityNumber",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/municipality/{municipalityNumber}/locality",
+        "tags": [
+          "MunicipalityStatistics"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "municipalityNumber",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/municipality/{municipalityNumber}/realareaused/{year}",
+        "tags": [
+          "MunicipalityStatistics"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "municipalityNumber",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/municipality/{municipalityNumber}/localityarea/{year}",
+        "tags": [
+          "MunicipalityStatistics"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "municipalityNumber",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/municipality/{municipalityNumber}/localityarea",
+        "tags": [
+          "MunicipalityStatistics"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "municipalityNumber",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/municipality/{municipalityNumber}/capacity/{year}",
+        "tags": [
+          "MunicipalityStatistics"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "municipalityNumber",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/municipality/{municipalityNumber}/capacity",
+        "tags": [
+          "MunicipalityStatistics"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "municipalityNumber",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/municipality/{municipalityNumber}/salmonlice",
+        "tags": [
+          "MunicipalityStatistics"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "municipalityNumber",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/municipality/{municipalityNumber}/treatment",
+        "tags": [
+          "MunicipalityStatistics"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "municipalityNumber",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/municipality/{municipalityNumber}/momb",
+        "tags": [
+          "MunicipalityStatistics"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "municipalityNumber",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/municipality/{municipalityNumber}/rivercatch",
+        "tags": [
+          "MunicipalityStatistics"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "municipalityNumber",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/municipality/{municipalityNumber}/environmentalsurveys",
+        "tags": [
+          "MunicipalityStatistics"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "municipalityNumber",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/municipality/{municipalityNumber}/farmedfishescapes",
+        "tags": [
+          "MunicipalityStatistics"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "municipalityNumber",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/municipality/{municipalityNumber}/payout",
+        "tags": [
+          "MunicipalityStatistics"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "municipalityNumber",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/municipality/{municipalityNumber}/realareaused",
+        "tags": [
+          "MunicipalityStatistics"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "municipalityNumber",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/municipality/{municipalityNumber}/fishhealth/{disease}",
+        "tags": [
+          "MunicipalityStatistics"
+        ],
+        "deprecated": true,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "municipalityNumber",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "disease",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/municipality/{municipalityNumber}/diseaselocality",
+        "tags": [
+          "MunicipalityStatistics"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "municipalityNumber",
+            "location": "path",
+            "required": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "barentswatch_production_areas",
+    "provider": "barentswatch",
+    "title": "Norwegian aquaculture production areas",
+    "description": "Production-area reference data and period-specific context for the Norwegian aquaculture management areas.",
+    "topics": [
+      "production area",
+      "area de produccion",
+      "área de producción",
+      "region",
+      "región",
+      "Norway",
+      "Noruega"
+    ],
+    "variables": [
+      {
+        "name": "productionArea",
+        "unit": "area metadata",
+        "description": "Identifiers, names and spatial/context fields."
+      }
+    ],
+    "dimensions": [
+      "production area",
+      "ISO year",
+      "ISO week"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Dataset-specific; Fish Health includes historical data from 2012, with field-specific changes."
+    },
+    "access": {
+      "authentication": "BarentsWatch API client credentials; OAuth2 scope api.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [],
+    "limitations": [
+      "Catalogue only: reference and weekly-area endpoints are not wrapped.",
+      "An area called production area is a management geography, not a dataset of production tonnage."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/fishhealth/openapi.json",
+      "https://developer.barentswatch.no/docs/fishhealth/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/geodata/productionarea",
+        "tags": [
+          "ProductionArea"
+        ],
+        "deprecated": true,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/productionarea/{productionAreaId}/{year}/{week}",
+        "tags": [
+          "ProductionArea"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "productionAreaId",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "barentswatch_marine_geodata",
+    "provider": "barentswatch",
+    "title": "Habitats, fishing grounds, protected areas and maritime geography",
+    "description": "Spatial information on cod spawning, shrimp grounds, shell-sand areas, protected/proposed areas, salmon fjords and rivers, fairways and maritime boundaries.",
+    "topics": [
+      "habitat",
+      "spawning",
+      "desove",
+      "protected",
+      "protegida",
+      "shrimp",
+      "camaron",
+      "camarón",
+      "cod",
+      "bacalao",
+      "river",
+      "rio",
+      "río",
+      "fjord",
+      "fiordo",
+      "Norway",
+      "Noruega"
+    ],
+    "variables": [
+      {
+        "name": "geometry",
+        "unit": "geospatial",
+        "description": "Source map features and boundaries."
+      },
+      {
+        "name": "attributes",
+        "unit": "provider fields",
+        "description": "Feature identifiers and descriptive attributes."
+      }
+    ],
+    "dimensions": [
+      "geographic feature"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Dataset-specific; Fish Health includes historical data from 2012, with field-specific changes."
+    },
+    "access": {
+      "authentication": "BarentsWatch API client credentials; OAuth2 scope api.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [],
+    "limitations": [
+      "Catalogue only: geospatial lookup/download endpoints are not wrapped.",
+      "Several operations require source feature identifiers."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/fishhealth/openapi.json",
+      "https://developer.barentswatch.no/docs/fishhealth/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/geodata/codspawningground/{id}",
+        "tags": [
+          "CodSpawningGround"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "id",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fairways/{id}",
+        "tags": [
+          "Fairway"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "id",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/maritimeboundary",
+        "tags": [
+          "MaritimeBoundary"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/proposedprotectedarea/{id}",
+        "tags": [
+          "ProposedProtectedAreas"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "id",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/protectedarea/{id}",
+        "tags": [
+          "ProtectedAreas"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "id",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/salmonfjord",
+        "tags": [
+          "SalmonFjord"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/salmonfjord/{id}",
+        "tags": [
+          "SalmonFjord"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "id",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/salmonriver",
+        "tags": [
+          "SalmonRiver"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/salmonriver/{riverId}",
+        "tags": [
+          "SalmonRiver"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "riverId",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "query",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/shellsandarea/{id}",
+        "tags": [
+          "ShellSandArea"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "id",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/shrimpfishingground/{id}",
+        "tags": [
+          "ShrimpFishingGround"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "id",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/spawningareas",
+        "tags": [
+          "SpawningArea"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/spawningareas/{id}",
+        "tags": [
+          "SpawningArea"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "id",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/localityarea",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymouslocalityarea",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "barentswatch_slaughterhouses",
+    "provider": "barentswatch",
+    "title": "Fish slaughterhouse directory and weekly details",
+    "description": "Searchable slaughterhouse reference and weekly records.",
+    "topics": [
+      "slaughterhouse",
+      "processing",
+      "planta",
+      "procesamiento",
+      "matadero",
+      "salmon",
+      "Norway",
+      "Noruega"
+    ],
+    "variables": [
+      {
+        "name": "slaughterhouse",
+        "unit": "provider records",
+        "description": "Identifiers, names and weekly details."
+      }
+    ],
+    "dimensions": [
+      "slaughterhouse",
+      "year",
+      "week"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Dataset-specific; Fish Health includes historical data from 2012, with field-specific changes."
+    },
+    "access": {
+      "authentication": "BarentsWatch API client credentials; OAuth2 scope api.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [],
+    "limitations": [
+      "Catalogue only: slaughterhouse operations are not wrapped.",
+      "Presence in the directory does not measure processing output or farm production."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/fishhealth/openapi.json",
+      "https://developer.barentswatch.no/docs/fishhealth/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishslaughterhouses",
+        "tags": [
+          "Slaughterhouse"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "query",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishslaughterhouses/{year}/{week}",
+        "tags": [
+          "Slaughterhouse"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishslaughterhouse/{id}/{year}/{week}",
+        "tags": [
+          "Slaughterhouse"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "id",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "barentswatch_vessel_visits",
+    "provider": "barentswatch",
+    "title": "Vessel traffic associated with fish farms",
+    "description": "Fish Health vessel directories, latest positions and week/year visit or track information around aquaculture sites.",
+    "topics": [
+      "vessel",
+      "boat",
+      "barco",
+      "buque",
+      "wellboat",
+      "visits",
+      "visitas",
+      "traffic",
+      "trafico",
+      "tráfico",
+      "Norway",
+      "Noruega"
+    ],
+    "variables": [
+      {
+        "name": "vessel tracks",
+        "unit": "positions/time",
+        "description": "Vessel tracks and visits as represented by Fish Health."
+      },
+      {
+        "name": "MMSI",
+        "unit": "identifier",
+        "description": "Vessel radio identity."
+      }
+    ],
+    "dimensions": [
+      "locality",
+      "vessel",
+      "year",
+      "week"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Dataset-specific; Fish Health includes historical data from 2012, with field-specific changes."
+    },
+    "access": {
+      "authentication": "BarentsWatch API client credentials; OAuth2 scope api.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [],
+    "limitations": [
+      "Catalogue only: these vessel endpoints are not wrapped or credential-tested.",
+      "Do not assume the Fish Health api token grants the separate AIS service scope.",
+      "Ship-information data can have terms different from NLOD."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/fishhealth/openapi.json",
+      "https://developer.barentswatch.no/docs/fishhealth/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/locality/{localityNo}/vessel/{year}/{week}",
+        "tags": [
+          "VesselTrackWeek"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/locality/{localityNo}/vessel/{year}",
+        "tags": [
+          "VesselTrackWeek"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "localityNo",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/vesseltrack/{mmsi}/{year}/{week}",
+        "tags": [
+          "VesselTrackWeek"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "mmsi",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "year",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "week",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/vesselslatestpositions",
+        "tags": [
+          "VesselTrackWeek"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/vesselslatestpositions/{mmsi}",
+        "tags": [
+          "VesselTrackWeek"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "mmsi",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishhealth/vessels",
+        "tags": [
+          "VesselTrackWeek"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "query",
+            "location": "query",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "barentswatch_fiskinfo",
+    "provider": "barentswatch",
+    "title": "FiskInfo fishing and navigation data",
+    "description": "Fishing-related spatial datasets, regulations, navigation warnings, fishing-activity layers and ship lookup.",
+    "topics": [
+      "fishing",
+      "pesca",
+      "navigation",
+      "navegacion",
+      "regulation",
+      "regulacion",
+      "gear",
+      "artes",
+      "Norway",
+      "Noruega"
+    ],
+    "variables": [
+      {
+        "name": "spatial datasets",
+        "unit": "provider formats",
+        "description": "Data and downloadable layers described by the FiskInfo service."
+      }
+    ],
+    "dimensions": [
+      "provider-specific"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Service-specific; inspect current source coverage."
+    },
+    "access": {
+      "authentication": "Service-specific authentication/permissions; not tested with this project client.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [],
+    "limitations": [
+      "Catalogue only; no FiskInfo download tool is implemented.",
+      "Detailed fishing-facility vessel information is restricted and requires separate access/agreements; ordinary API credentials are not evidence of permission."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/fiskinfo/openapi.json",
+      "https://developer.barentswatch.no/docs/FiskInfo/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/geodata/andoya-firing-range-danger-zone",
+        "tags": [
+          "AndoyaFiringRangeDangerZone"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/coastalcodregulation/{areaId}",
+        "tags": [
+          "CoastalCodRegulation"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "areaId",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymous-andoya-firing-range-danger-zone",
+        "tags": [
+          "DatasetDownload"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/breivikfjordenlokalregulering",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/service/downloadable",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "lang",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/service/downloadable/{datasetName}",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "datasetName",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "lang",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/service/subscribable",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "lang",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/forbiddenfishingzone",
+        "tags": [
+          "ForbiddenFishingZones"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/forbiddenfishingzone/{objectId}",
+        "tags": [
+          "ForbiddenFishingZones"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "objectId",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/subscription",
+        "tags": [
+          "GeoDataSubscription"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/subscription/{id}",
+        "tags": [
+          "GeoDataSubscription"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "id",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/jmelding/{id}",
+        "tags": [
+          "JMelding"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "id",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/lostfishingfacility/notremoved",
+        "tags": [
+          "LostFishingFacility"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "time",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/lostfishingfacility",
+        "tags": [
+          "LostFishingFacility"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "isRemoved",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "lostBefore",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "lostAfter",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "notRemovedBefore",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "notRemovedAfter",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "vesselId",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "maxResults",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "offsetResults",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "orderBy",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/lostfishingfacility/{lostmessageid}",
+        "tags": [
+          "LostFishingFacility"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "lostmessageid",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/npdfacility/{idFacility}",
+        "tags": [
+          "NpdFacility"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "idFacility",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/NpdSurvey/{idSurvey}/{netOrGross}",
+        "tags": [
+          "NpdSurvey"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "idSurvey",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "netOrGross",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/npdsurveyfisheryexpert/{id}",
+        "tags": [
+          "NpdSurvey"
+        ],
+        "deprecated": true,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "id",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/npdsurveyfisheryexperts/{id}",
+        "tags": [
+          "NpdSurvey"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "id",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fiskinfo/othernationsborder/{id}",
+        "tags": [
+          "OtherNationsBorders"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "id",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/pollockseineregulation",
+        "tags": [
+          "PollockSeineRegulations"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/pollockseineregulation/{id}",
+        "tags": [
+          "PollockSeineRegulations"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "id",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/shipregister/{mmsi}",
+        "tags": [
+          "ShipRegister"
+        ],
+        "deprecated": true,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "mmsi",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v2/shipregister/{mmsi}",
+        "tags": [
+          "ShipRegister"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "mmsi",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/transshipment-points",
+        "tags": [
+          "Transshipment"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/transshipment/vesselsinzone/{fid}",
+        "tags": [
+          "Transshipment"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "fid",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/zerofishingarea",
+        "tags": [
+          "ZeroFishingArea"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/zerofishingarea/{objectId}",
+        "tags": [
+          "ZeroFishingArea"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "objectId",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/andoya-firing-range-danger-zone",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousandoya-firing-range-danger-zone",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/coastalcodregulations",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymouscoastalcodregulations",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/coralreef",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymouscoralreef",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/eqmsurveillancezone",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymouseqmsurveillancezone",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/fishingfacility",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousfishingfacility",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/fishingfacilityandandoyafiringrangedangerzone",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousfishingfacilityandandoyafiringrangedangerzone",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/forbiddenfishingzone",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousforbiddenfishingzone",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/icechart",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/iceedge",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/jmelding",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousjmelding",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/lofotfisket",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymouslofotfisket",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/lostfishingfacility",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymouslostfishingfacility",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/maritimeboundary",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousmaritimeboundary",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/militaryprohibitionzone",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousmilitaryprohibitionzone",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/npdemsurveyongoing",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousnpdemsurveyongoing",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/npdemsurveyplanned",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousnpdemsurveyplanned",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/npdfacility",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousnpdfacility",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/npdothersurveyongoing",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousnpdothersurveyongoing",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/npdothersurveyplanned",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousnpdothersurveyplanned",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/npdsurveyongoing",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousnpdsurveyongoing",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/npdsurveyplanned",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousnpdsurveyplanned",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/oceanfishingregulationsbigboats",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousoceanfishingregulationsbigboats",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/oceanfishingregulationssmallboats",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousoceanfishingregulationssmallboats",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/pollockseineregulations",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymouspollockseineregulations",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/protectedarea",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousprotectedarea",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/shellsandarea",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousshellsandarea",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/shrimpfishingground",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousshrimpfishingground",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/tradearea-1",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymoustradearea-1",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/tradearea-2",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymoustradearea-2",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/tradearea-3",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymoustradearea-3",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/tradearea-4",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymoustradearea-4",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/tradearea-bankfiske1",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymoustradearea-bankfiske1",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/tradearea-fjordfiske",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymoustradearea-fjordfiske",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/tradearea-kystfiske",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymoustradearea-kystfiske",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/tradearea-litenkystfart",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymoustradearea-litenkystfart",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/vhf-coverage",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/download/anonymousvhf-coverage",
+        "tags": [
+          "Download"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "format",
+            "location": "query",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "barentswatch_fiskinfo_reporting",
+    "provider": "barentswatch",
+    "title": "Fishing-gear reports and user vessel profiles",
+    "description": "User-associated fishing-gear and lost-gear reports with restricted access.",
+    "topics": [
+      "gear",
+      "nets",
+      "pots",
+      "longline",
+      "redes",
+      "nasas",
+      "palangre",
+      "lost gear",
+      "artes perdidas"
+    ],
+    "variables": [
+      {
+        "name": "gear reports",
+        "unit": "restricted records",
+        "description": "User-associated gear and vessel reports."
+      }
+    ],
+    "dimensions": [
+      "provider-specific"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Service-specific; inspect current source coverage."
+    },
+    "access": {
+      "authentication": "Service-specific authentication/permissions; not tested with this project client.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [],
+    "limitations": [
+      "Catalogue only; read/write reporting operations are not integrated.",
+      "Separate authorization and Coast Guard agreement can be required. No user-report endpoints were accessed."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/fiskinfo-reporting/openapi.json",
+      "https://developer.barentswatch.no/docs/FiskInfo/fiskinforeporting/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v3/geodata/fishingfacilitychanges",
+        "tags": [
+          "Reporting"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v2/geodata/fishingfacilitychanges",
+        "tags": [
+          "Reporting"
+        ],
+        "deprecated": true,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/lostreports",
+        "tags": [
+          "Lost FishingFacility"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "since",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v3/geodata/fishingfacilityprofile",
+        "tags": [
+          "Profile"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v2/geodata/fishingfacilityprofile",
+        "tags": [
+          "Profile"
+        ],
+        "deprecated": true,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishingfacilityprofile",
+        "tags": [
+          "Profile"
+        ],
+        "deprecated": true,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v3/geodata/fishingfacility/{toolId}",
+        "tags": [
+          "FishingFacility"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "toolId",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishingfacility/{toolId}",
+        "tags": [
+          "FishingFacility"
+        ],
+        "deprecated": true,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "toolId",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v3/geodata/fishingfacility",
+        "tags": [
+          "FishingFacility"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "vesselId",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "mmsi",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v2/geodata/fishingfacility/{mmsi}",
+        "tags": [
+          "FishingFacility"
+        ],
+        "deprecated": true,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "mmsi",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishingfacility",
+        "tags": [
+          "FishingFacility"
+        ],
+        "deprecated": true,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v2/geodata/fishingfacilityupdates",
+        "tags": [
+          "FishingFacility"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "since",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishingfacility/updates",
+        "tags": [
+          "FishingFacility"
+        ],
+        "deprecated": true,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "since",
+            "location": "query",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fishingfacilityownhistoric/{since}",
+        "tags": [
+          "FishingFacility"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "since",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/lostfishingfacility/user/notremoved",
+        "tags": [
+          "Lost FishingFacility"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      }
+    ]
+  },
+  {
+    "id": "barentswatch_tracking_buoys",
+    "provider": "barentswatch",
+    "title": "Fishing-gear tracking buoys",
+    "description": "Position messages, buoy properties and access associated with a vendor or authorized user.",
+    "topics": [
+      "buoy",
+      "boya",
+      "tracking",
+      "rastreo",
+      "fishing gear",
+      "artes de pesca"
+    ],
+    "variables": [
+      {
+        "name": "position messages",
+        "unit": "positions/time",
+        "description": "Authorized buoy positions and properties."
+      }
+    ],
+    "dimensions": [
+      "provider-specific"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Service-specific; inspect current source coverage."
+    },
+    "access": {
+      "authentication": "Service-specific authentication/permissions; not tested with this project client.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [],
+    "limitations": [
+      "Catalogue only; not a general public buoy archive. Vendor/user authorization is required and was not tested."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/fiskinfo-buoys/openapi.json",
+      "https://developer.barentswatch.no/docs/category/fiskinfo/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/trackingbuoys/messages/latest",
+        "tags": [
+          "Tracking Buoys - Vendor API"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/trackingbuoys/buoyproperties",
+        "tags": [
+          "Tracking Buoys - Vendor API"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/trackingbuoys/mybuoys",
+        "tags": [
+          "Tracking Buoys - User API"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/trackingbuoys/users",
+        "tags": [
+          "Tracking Buoys - Vendor API"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "vendorbuoyid",
+            "location": "query",
+            "required": false
+          },
+          {
+            "name": "userid",
+            "location": "query",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "barentswatch_polar_lows",
+    "provider": "barentswatch",
+    "title": "Polar-low alerts",
+    "description": "API schema for active polar-low weather alerts.",
+    "topics": [
+      "polar low",
+      "baja polar",
+      "weather",
+      "meteorologia",
+      "alert",
+      "alerta"
+    ],
+    "variables": [
+      {
+        "name": "alerts",
+        "unit": "alert records",
+        "description": "Active warning records when supplied."
+      }
+    ],
+    "dimensions": [
+      "provider-specific"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Service-specific; inspect current source coverage."
+    },
+    "access": {
+      "authentication": "Service-specific authentication/permissions; not tested with this project client.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [],
+    "limitations": [
+      "Catalogue only; current alert availability has not been tested. This is not a historical climate series."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/polarlows/openapi.json",
+      "https://developer.barentswatch.no/docs/polarlows/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/metalerts/polarlows",
+        "tags": [
+          "PolarLows"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "lang",
+            "location": "query",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "barentswatch_saltstraumen",
+    "provider": "barentswatch",
+    "title": "Saltstraumen tidal-current forecasts",
+    "description": "Short- and longer-horizon predictions for the Saltstraumen current.",
+    "topics": [
+      "current",
+      "corriente",
+      "tide",
+      "marea",
+      "Saltstraumen",
+      "forecast",
+      "pronostico"
+    ],
+    "variables": [
+      {
+        "name": "current forecast",
+        "unit": "provider units",
+        "description": "Forecast current strength and direction."
+      }
+    ],
+    "dimensions": [
+      "provider-specific"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Service-specific; inspect current source coverage."
+    },
+    "access": {
+      "authentication": "Service-specific authentication/permissions; not tested with this project client.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [],
+    "limitations": [
+      "Catalogue only; no forecast download is implemented. Check units and forecast horizon at retrieval."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/saltstraumen/openapi.json",
+      "https://developer.barentswatch.no/docs/saltstraumen/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/geodata/saltstraumen",
+        "tags": [
+          "Saltstraumen"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/saltstraumenlong",
+        "tags": [
+          "Saltstraumen"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      }
+    ]
+  },
+  {
+    "id": "barentswatch_wave_forecasts",
+    "provider": "barentswatch",
+    "title": "Coastal wave, wind and current forecasts",
+    "description": "Forecast services for exposed coastal passages, points and routes.",
+    "topics": [
+      "wave",
+      "ola",
+      "wind",
+      "viento",
+      "current",
+      "corriente",
+      "forecast",
+      "pronostico",
+      "route",
+      "ruta"
+    ],
+    "variables": [
+      {
+        "name": "forecast fields",
+        "unit": "provider units",
+        "description": "Wave, wind and related route/point forecast variables."
+      }
+    ],
+    "dimensions": [
+      "provider-specific"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Service-specific; inspect current source coverage."
+    },
+    "access": {
+      "authentication": "Service-specific authentication/permissions; not tested with this project client.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [],
+    "limitations": [
+      "Catalogue only; no forecast download is implemented. Some operations in the schema are deprecated."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/waveforecast/openapi.json",
+      "https://developer.barentswatch.no/docs/waveforecast/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/geodata/gimsoysundet",
+        "tags": [
+          "Currents"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/karmsundet",
+        "tags": [
+          "Currents"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/kvalsundet",
+        "tags": [
+          "Currents"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/raftsundet",
+        "tags": [
+          "Currents"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/rystraumen",
+        "tags": [
+          "Currents"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/sandnessundet",
+        "tags": [
+          "Currents"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/sortlandsundet",
+        "tags": [
+          "Currents"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/tjeldsundet",
+        "tags": [
+          "Currents"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/tromsoysundet",
+        "tags": [
+          "Currents"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/vatlestraumen",
+        "tags": [
+          "Currents"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/waveforecast/route/customroutearea",
+        "tags": [
+          "CustomRoute"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v2/geodata/waveforecast/route/customroutearea",
+        "tags": [
+          "CustomRoute"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/fairway/wind/{modelName}/{fairwayId}/{time}",
+        "tags": [
+          "FairwayWeather"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "modelName",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "fairwayId",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "time",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/langesund-currentpoints",
+        "tags": [
+          "Langesund"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "time",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/langesund-point/{name}",
+        "tags": [
+          "Langesund"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "name",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/langesund-opposingsea",
+        "tags": [
+          "Langesund"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "time",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/langesund-river",
+        "tags": [
+          "Langesund"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "time",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/langesund-river/{modelName}",
+        "tags": [
+          "Langesund"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "modelName",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/currentwaves-maincurrent",
+        "tags": [
+          "Moskstraumen"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v2/geodata/currentwaves-points",
+        "tags": [
+          "Moskstraumen"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "time",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v2/geodata/currentwaves-point/{name}",
+        "tags": [
+          "Moskstraumen"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "name",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/currentwaves-strinn",
+        "tags": [
+          "Moskstraumen"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "time",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/seacurrent/nearest",
+        "tags": [
+          "ForecastPoint"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "x",
+            "location": "query",
+            "required": true
+          },
+          {
+            "name": "y",
+            "location": "query",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/seacurrent/nearest/all",
+        "tags": [
+          "ForecastPoint"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "x",
+            "location": "query",
+            "required": true
+          },
+          {
+            "name": "y",
+            "location": "query",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/severegalevesselrestrictionzonealerts",
+        "tags": [
+          "SevereGaleVesselRestrictionZoneAlerts"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "lang",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/severegalevesselrestrictionzonealerts/{zoneId}",
+        "tags": [
+          "SevereGaleVesselRestrictionZoneAlerts"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "zoneId",
+            "location": "path",
+            "required": true
+          },
+          {
+            "name": "lang",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v2/geodata/waveforecast/fairway",
+        "tags": [
+          "Waveforecast"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/waveforecast/simplefairway",
+        "tags": [
+          "Waveforecast"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "query",
+            "location": "query",
+            "required": false
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v2/geodata/waveforecast",
+        "tags": [
+          "Waveforecast"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "modelname",
+            "location": "query",
+            "required": true
+          },
+          {
+            "name": "fairwayid",
+            "location": "query",
+            "required": true
+          },
+          {
+            "name": "time",
+            "location": "query",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/waveforecast/available/all",
+        "tags": [
+          "Waveforecast"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/waveforecast/available",
+        "tags": [
+          "Waveforecast"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "modelname",
+            "location": "query",
+            "required": true
+          },
+          {
+            "name": "fairwayid",
+            "location": "query",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/waveforecast/pointforecasts",
+        "tags": [
+          "Waveforecast"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "time",
+            "location": "query",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/waveforecast/pointforecast",
+        "tags": [
+          "Waveforecast"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "modelname",
+            "location": "query",
+            "required": true
+          },
+          {
+            "name": "pointId",
+            "location": "query",
+            "required": true
+          },
+          {
+            "name": "time",
+            "location": "query",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/waveforecast/xseasforecasts",
+        "tags": [
+          "Waveforecast"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "time",
+            "location": "query",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/waveforecast/xseasforecasts/daily",
+        "tags": [
+          "Waveforecast"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "time",
+            "location": "query",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/waveforecast/xseasforecasts/point",
+        "tags": [
+          "Waveforecast"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "time",
+            "location": "query",
+            "required": true
+          },
+          {
+            "name": "x",
+            "location": "query",
+            "required": true
+          },
+          {
+            "name": "y",
+            "location": "query",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/waveforecast/modelrundatetime",
+        "tags": [
+          "Waveforecast"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/geodata/waveforecast/geometry/{modelName}",
+        "tags": [
+          "Waveforecast"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "modelName",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/waveforecastpoint/nearest",
+        "tags": [
+          "ForecastPoint"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "x",
+            "location": "query",
+            "required": true
+          },
+          {
+            "name": "y",
+            "location": "query",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/waveforecastpoint/nearest/all",
+        "tags": [
+          "ForecastPoint"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "x",
+            "location": "query",
+            "required": true
+          },
+          {
+            "name": "y",
+            "location": "query",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/windforecastpoint/nearest/all",
+        "tags": [
+          "ForecastPoint"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "x",
+            "location": "query",
+            "required": true
+          },
+          {
+            "name": "y",
+            "location": "query",
+            "required": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "barentswatch_drift",
+    "provider": "barentswatch",
+    "title": "Drift-service objects, status and paths",
+    "description": "The public OpenAPI directory includes a drift-service interface with object/status/path read endpoints.",
+    "topics": [
+      "drift",
+      "deriva",
+      "trajectory",
+      "trayectoria"
+    ],
+    "variables": [
+      {
+        "name": "object paths",
+        "unit": "provider schema",
+        "description": "Object paths exposed by the drift-service schema."
+      }
+    ],
+    "dimensions": [
+      "provider-specific"
+    ],
+    "coverage": {
+      "geography": "Norway",
+      "temporal": "Service-specific; inspect current source coverage."
+    },
+    "access": {
+      "authentication": "Service-specific authentication/permissions; not tested with this project client.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [],
+    "limitations": [
+      "Catalogue only. Service purpose, access rights and data availability were not established beyond the public schema; do not recommend it as ready-to-use scientific observations."
+    ],
+    "references": [
+      "https://www.barentswatch.no/bwapi/openapi/drift/openapi.json",
+      "https://www.barentswatch.no/bwapi/openapi/drift/openapi.json"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/v1/drift/all",
+        "tags": [
+          "DriftUser"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": []
+      },
+      {
+        "method": "GET",
+        "path": "/v1/drift/{objectId}",
+        "tags": [
+          "DriftUser"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "objectId",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/drift/{objectId}/status",
+        "tags": [
+          "DriftUser"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "objectId",
+            "location": "path",
+            "required": true
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/v1/drift/{objectId}/paths",
+        "tags": [
+          "DriftUser"
+        ],
+        "deprecated": false,
+        "available_in_mcp": false,
+        "parameters": [
+          {
+            "name": "objectId",
+            "location": "path",
+            "required": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "barentswatch_ais",
+    "provider": "barentswatch",
+    "title": "Live and recent historical AIS vessel positions",
+    "description": "Separate AIS services expose permitted vessel-position observations and recent tracks.",
+    "topics": [
+      "AIS",
+      "vessel",
+      "buque",
+      "barco",
+      "position",
+      "posicion",
+      "posición",
+      "traffic",
+      "trafico",
+      "tráfico"
+    ],
+    "variables": [
+      {
+        "name": "position",
+        "unit": "longitude/latitude",
+        "description": "Vessel position messages."
+      },
+      {
+        "name": "MMSI",
+        "unit": "identifier",
+        "description": "Vessel identifier."
+      },
+      {
+        "name": "timestamp",
+        "unit": "datetime",
+        "description": "Message time."
+      }
+    ],
+    "dimensions": [
+      "vessel",
+      "time",
+      "position"
+    ],
+    "coverage": {
+      "geography": "Documented Norwegian open-AIS geographic coverage; see source map.",
+      "temporal": "Live and up to 14 days of recent historical data under documented open-service limits."
+    },
+    "access": {
+      "authentication": "OAuth2 scope ais, separate from the Fish Health api scope; verify client permissions.",
+      "method": "Provider REST API; only tools listed in download_tools are implemented here."
+    },
+    "download_tools": [],
+    "limitations": [
+      "Catalogue only; no AIS tool is implemented and AIS credentials were not tested.",
+      "The open service excludes fishing vessels under 15 m and leisure/sailing vessels under 45 m.",
+      "Documented open access has a 14-day historical limit."
+    ],
+    "references": [
+      "https://developer.barentswatch.no/docs/AIS/live-ais-api/",
+      "https://developer.barentswatch.no/docs/AIS/historic-ais-api/"
+    ],
+    "verified_on": "2026-09-28",
+    "api_operations": []
+  }
+]

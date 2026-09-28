@@ -14,23 +14,28 @@ from mcp.server.mcpserver.exceptions import ToolError
 from .settings import load_local_credentials
 
 load_local_credentials()  # Copernicus Marine reads environment credentials during import.
-from . import barentswatch, copernicus, fishstat
+from . import barentswatch, catalogue, copernicus, fishstat
 
 
 mcp = MCPServer(
     "Fisheries Data",
     instructions=(
         "Find, describe and download fisheries and marine datasets. "
-        "Use list_data_sources to check coverage and output structure. "
-        "For a research question, identify relevant datasets and gaps before downloading. "
+        "For research questions, use search_data_catalogue then describe_data_dataset to propose relevant data. "
+        "Label catalogue_only entries as external/manual routes that this MCP cannot download. "
+        "Label suggestions beyond the reviewed catalogue as external sources whose access through this MCP is unverified. "
+        "Search matches are candidate datasets, not proof of observations: resolve species, countries, "
+        "localities, periods and variables with the source tools before claiming availability. "
         "Clarify ambiguous species, countries, periods, variables or table structure before downloading. "
         "Explain the delivered fields, units, selection, missing values and source citation. "
         "FishStat country totals are documented query aggregations. "
         "This server supplies data for subsequent analysis; it does not fit models, test hypotheses, "
         "interpret scientific results or join data sources. State when a requested dataset or table "
         "structure is unsupported instead of inventing data. "
-        "FishStat comprises multiple collections: this server connects Global Production quantities "
-        "and Aquaculture quantities and monetary production values; it does not cover all FishStat."
+        "The catalogue documents more FishStat collections and BarentsWatch services than the "
+        "implemented download tools. Read access requirements and limitations before recommending a route. "
+        "Use the live Copernicus catalogue for its dataset-level coverage. "
+        "Preserve provider reporting flags: an unreported observation must not be presented as a measured zero."
     ),
 )
 
@@ -85,6 +90,8 @@ def _tool_error(exc: Exception) -> ToolError:
 def list_data_sources() -> dict:
     """List available sources, coverage and output structure before choosing a dataset to download."""
     return {
+        "discovery_tools": ["list_datasets", "search_data_catalogue", "describe_data_dataset"],
+        "catalogue_scope": catalogue.CATALOGUE_SCOPE,
         "sources": [
             {
                 "id": "fishstat",
@@ -93,7 +100,7 @@ def list_data_sources() -> dict:
                 "tools": ["search_fishstat_species", "fishstat_production_by_country"],
                 "url": "https://www.fao.org/fishery/static/Data/",
                 "table_structure": fishstat.TABLE_STRUCTURE,
-                "limitations": "This collection supplies quantities only. Use fishstat_aquaculture_records for aquaculture monetary production values. Other FishStat collections are not connected.",
+                "limitations": "This download tool supplies quantities only. Use fishstat_aquaculture_records for aquaculture monetary production values. Use list_datasets(provider='fishstat') for other documented collections and their download status.",
             },
             {
                 "id": "fishstat_aquaculture",
@@ -112,10 +119,11 @@ def list_data_sources() -> dict:
             {
                 "id": "barentswatch",
                 "name": "BarentsWatch Fish Health",
-                "covers": "Norwegian aquaculture locality data, including weekly salmon lice reports.",
-                "tools": ["barentswatch_lice_by_locality"],
+                "covers": "Find Norwegian aquaculture localities; retrieve lice stages, sea temperature, treatments, disease cases, escapes, capacity and weekly site snapshots.",
+                "tools": ["barentswatch_search_localities", "barentswatch_get_locality_data", "barentswatch_get_locality_details", "barentswatch_lice_by_locality"],
                 "url": "https://developer.barentswatch.no/docs/fishhealth/",
-                "table_structure": barentswatch.TABLE_STRUCTURE,
+                "output_structure": "Site-year datasets export CSV plus metadata describing fields, units, reporting flags and any nested JSON cells. Weekly site details export nested JSON. Each query returns its specific structure.",
+                "catalogue_note": "Use list_datasets(provider='barentswatch') to discover other Fish Health datasets and BarentsWatch services, including those without an implemented download tool.",
             },
             {
                 "id": "copernicus_marine",
@@ -128,6 +136,33 @@ def list_data_sources() -> dict:
         ],
         "scope_note": "Search, describe and download data with source metadata. The server prepares source-specific selections and documented country totals; statistical analysis, scientific interpretation and joins between sources are outside its scope.",
     }
+
+
+@mcp.tool()
+def list_datasets(provider: str = "all") -> dict:
+    """List the reviewed dataset inventory and which datasets have MCP download tools. Providers: all, fishstat, barentswatch, copernicus_marine. Includes catalogue-only datasets with external/manual access routes."""
+    try:
+        return catalogue.list_datasets(provider)
+    except Exception as exc:
+        raise _tool_error(exc) from exc
+
+
+@mcp.tool()
+def search_data_catalogue(query: str, provider: str = "all", limit: int = 10) -> dict:
+    """Find candidate datasets from English or Spanish research topics (production/value, trade, employment, sea lice, temperature, disease). Search reviewed metadata without credentials or downloading data. Results distinguish downloadable from catalogue_only and surface unmatched terms. Verify actual coverage before recommending a download; use live source searches as needed."""
+    try:
+        return catalogue.search_data_catalogue(query, provider, limit)
+    except Exception as exc:
+        raise _tool_error(exc) from exc
+
+
+@mcp.tool()
+def describe_data_dataset(dataset_id: str) -> dict:
+    """Describe one catalogue dataset's variables, units, dimensions, coverage, access requirements, available tools, limitations and primary references. Use the exact ID returned by list_datasets or search_data_catalogue."""
+    try:
+        return catalogue.describe_data_dataset(dataset_id)
+    except Exception as exc:
+        raise _tool_error(exc) from exc
 
 
 @mcp.tool()
@@ -179,8 +214,49 @@ def fishstat_production_by_country(
 
 
 @mcp.tool()
+def barentswatch_search_localities(query: str = "", limit: int = 50) -> dict:
+    """Find current Norwegian aquaculture site IDs by locality name or number. Returns localityNo, name and municipality. Query does not search municipality names. Limit 1-1000; narrow a truncated search. A directory match does not prove that the site reported lice or operated in a historical year."""
+    try:
+        return barentswatch.search_localities(query, limit)
+    except Exception as exc:
+        raise _tool_error(exc) from exc
+
+
+@mcp.tool()
+def barentswatch_get_locality_data(locality_id: int, year: int, dataset: str = "lice_stages") -> dict:
+    """Download one site-year as CSV with metadata. Datasets: lice_stages, sea_temperature, treatments, diseases, escapes, capacity. Preserves provider fields, reporting flags and nested event lists. Disease cases can span years; capacity is an administrative limit, not production. Does not compute annual indicators. Returns all rows in the file and up to 20 preview rows."""
+    try:
+        result = barentswatch.locality_data(locality_id, year, dataset)
+        rows = result.pop("rows")
+        result.update(_export_rows(rows, result, f"barentswatch-{dataset}-{locality_id}-{year}"))
+        result["row_count"] = len(rows)
+        result["rows_preview"] = rows[:20]
+        return result
+    except Exception as exc:
+        raise _tool_error(exc) from exc
+
+
+@mcp.tool()
+def barentswatch_get_locality_details(locality_id: int, year: int, week: int) -> dict:
+    """Download a site's nested JSON snapshot for an ISO year/week: licenses and permitted species/capacity, location, fish-health reports and reporting flags. License species are not proof of actual stocked species. Returns the source snapshot, JSON file and provenance; no flattening or joins."""
+    try:
+        result = barentswatch.locality_details(locality_id, year, week)
+        directory = _output_dir()
+        directory.mkdir(parents=True, exist_ok=True)
+        stem = f"barentswatch-site-{locality_id}-{year}-{week}-{datetime.now(timezone.utc):%Y%m%dT%H%M%SZ}-{uuid4().hex[:8]}"
+        json_path = directory / f"{stem}.json"
+        metadata_path = directory / f"{stem}.metadata.json"
+        json_path.write_text(json.dumps(result["data"], ensure_ascii=False, indent=2), encoding="utf-8")
+        metadata = {key: value for key, value in result.items() if key != "data"}
+        metadata_path.write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
+        return {**result, "json_path": str(json_path), "metadata_path": str(metadata_path)}
+    except Exception as exc:
+        raise _tool_error(exc) from exc
+
+
+@mcp.tool()
 def barentswatch_lice_by_locality(locality_id: int, year: int) -> dict:
-    """Download provider-reported weekly mean adult female salmon lice for a Norwegian aquaculture locality and year, with table structure and provenance. The means are supplied by BarentsWatch."""
+    """Download provider-reported weekly mean adult female salmon lice for a locality/year. For new research queries, prefer barentswatch_get_locality_data(dataset='lice_stages'), which also includes reporting flags and other lice stages. This older endpoint cannot distinguish every unreported zero."""
     try:
         result = barentswatch.lice_by_locality(locality_id, year)
         result.update(_export_rows(result.get("rows", []), {k: v for k, v in result.items() if k != "rows"}, f"barentswatch-lice-{locality_id}-{year}"))

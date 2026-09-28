@@ -6,6 +6,22 @@ This guide is for researchers who want to ask questions through an AI client and
 
 The server finds, describes and downloads data. It explains columns, units and data preparation; statistical analyses and scientific interpretation belong in your subsequent research workflow.
 
+## Can I start with a research question instead of a dataset name?
+
+Yes. For example:
+
+> I want to study salmon production, production value and salmon lice in Norway by year. Which datasets available through this MCP could help? Explain their variables, units, years and observation levels. Distinguish connected downloads from sources that require another access route, and identify any missing information. Do not analyse the data yet.
+
+The AI client can use `search_data_catalogue` and `describe_data_dataset` to find and explain relevant catalogue entries. `list_datasets` shows the documented inventory. Once species, periods, places and measures are clear, the client can call the applicable download tools and explain the files it retrieves.
+
+In this example, FAO Global Aquaculture provides annual quantity and production-value observations; BarentsWatch provides weekly fish-health reports by locality. Turning the latter into a national yearly lice indicator requires decisions about aggregation and weighting. The server supplies the underlying data and explains this difference; it does not create that indicator or calculate production growth.
+
+## Does a catalogue entry mean the MCP can download that data?
+
+No. The catalogue records both connected datasets (`downloadable`) and useful provider datasets whose downloads are not yet implemented (`catalogue_only`). Check the entry's download tools and limitations. A connected provider may still need your credentials and an appropriate selection. The AI should clearly state which data can be downloaded through this server and which require the provider's site, API or another tool.
+
+A relevant entry is also not proof of a complete time series for your selection. Available years can vary by species, country or locality. Missing observations are not zeros. If the AI suggests a source outside the catalogue, it should label that suggestion as external rather than implying this MCP retrieved or verified its data.
+
 ## What do I need?
 
 | Item | Needed? |
@@ -20,14 +36,14 @@ FishStat needs no data-source account. BarentsWatch and Copernicus Marine need t
 
 ## Does the server provide all FishStat data?
 
-No. FishStat contains several collections, and the current server connects two:
+The server's discovery catalogue describes multiple FishStat collections, with source references and access limitations. Its direct download tools currently connect two:
 
 | Connected collection | What the server downloads |
 | --- | --- |
 | Global Production | Production quantities grouped by country for one year; choose capture, aquaculture or both. |
 | Global Aquaculture | Quantity and production-value records for a year range, preserving species, country, area, culture environment, measure, unit and status. |
 
-Other FishStat collections are not yet connected. Global Production's country tool returns quantities only. Use `fishstat_aquaculture_records` when you need aquaculture production values, including a request for both quantities and values. These are production values, not the value of exports.
+Other documented FishStat collections are catalogue entries without connected download tools. Global Production's country tool returns quantities only. Use `fishstat_aquaculture_records` when you need aquaculture production values, including a request for both quantities and values. These are production values, not the value of exports.
 
 For the pinned Global Aquaculture release, quantities cover 1950–2024 in tonnes (live weight for animals; wet weight for aquatic plants). Production values cover 1984–2024 in **thousands of nominal US dollars**. Individual country/species series can have gaps or shorter coverage. The server preserves the units; it does not adjust for inflation or convert the value to a price. Missing (`O`) and suppressed (`Q`) values are exported as empty fields with their flags retained, even if their source field contains `0`. Non-significant (`N`) values keep the reported zero.
 
@@ -154,9 +170,15 @@ For aquaculture quantities and production values, ask:
 
 The AI client can call `fishstat_aquaculture_records(query, start_year, end_year, country_code="", species_code="", measure="both")` to fulfill this request. It can first look up the exact country code using `search_fishstat_countries(query, limit=20)`, which accepts English or Spanish country names and UN or ISO codes. Its long-format table keeps quantities and production values as separate rows, with their source dimensions, measure and unit. The CSV contains all matching rows, while the tool response previews the first 20. It does not join the two measures or calculate a price.
 
+For BarentsWatch, you can ask:
+
+> Find BarentsWatch locality 35657, then download its weekly lice stages and sea temperatures for 2022 as separate CSV files. Preserve reporting flags, explain the fields and cite the source. Do not calculate annual averages or merge the files.
+
+The client can use `barentswatch_search_localities` to resolve a name or ID and `barentswatch_get_locality_data` for the selected site-year. Other supported selections include treatments, disease cases, escapes and permitted capacity. `barentswatch_get_locality_details` retrieves a nested JSON site snapshot for a specific ISO week. Locality search is a current directory, not a historical list of operating salmon farms. Check `hasReportedLice` and `hasReported`: a zero associated with no report is not evidence of a measured zero.
+
 The FishStat tools write a CSV and a metadata JSON file, by default under `~/fisheries-data-mcp/exports`. You can set `FISHERIES_MCP_OUTPUT_DIR` to choose another folder. The [README](README.md#current-coverage) lists the current tools and the extra credentials needed for BarentsWatch and Copernicus Marine.
 
-You can also ask: "Before downloading, explain what each row and column represents, the units and the available years." FishStat and BarentsWatch CSV exports list the actual columns and row count, with descriptions for their standard fields. FishStat's Global Production country table groups and sums the selected source records; its Global Aquaculture table preserves the selected observations. BarentsWatch preserves the provider's reported weekly means. Copernicus downloads a subset without calculating averages and returns dataset metadata; its file structure varies by dataset and format.
+You can also ask: "Before downloading, explain what each row and column represents, the units and the available years." FishStat and BarentsWatch CSV exports list the actual columns and row count, with descriptions for their standard fields. FishStat's Global Production country table groups and sums the selected source records; its Global Aquaculture table preserves the selected observations. BarentsWatch preserves provider records and flags, including reported weekly means and event details where applicable. Copernicus downloads a subset without calculating averages and returns dataset metadata; its file structure varies by dataset and format.
 
 ## Will adding more sources require a new installation for each one?
 

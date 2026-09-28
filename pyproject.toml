@@ -20,3 +20,6 @@ fisheries-data-mcp = "fisheries_data_mcp.server:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+fisheries_data_mcp = ["catalogues/*.json"]

@@ -1,0 +1,20 @@
+[
+  {
+    "id": "copernicus_marine_catalogue",
+    "provider": "copernicus_marine",
+    "title": "Copernicus Marine ocean datasets",
+    "description": "Live catalogue of ocean observations, reanalyses and forecasts. Search and describe a specific dataset before requesting a spatial and temporal subset.",
+    "topics": ["ocean", "temperature", "temperatura", "salinity", "salinidad", "currents", "corrientes", "chlorophyll", "clorofila", "oxygen", "oxigeno", "waves", "olas", "environment", "ambiente", "marine", "marino"],
+    "variables": [
+      {"name": "Ocean physical and biogeochemical variables", "unit": "Dataset-specific: inspect live metadata", "description": "Examples include temperature, salinity, currents, chlorophyll and oxygen; actual variables and coverage depend on the selected dataset."}
+    ],
+    "dimensions": ["longitude", "latitude", "time", "depth (where present)"],
+    "coverage": {"geography": "Global and regional products", "period": "Dataset-specific; obtain live metadata", "frequency": "Dataset-specific"},
+    "access": {"authentication": "Catalogue searches are public; downloads use the user's Copernicus Marine account", "method": "Official Copernicus Marine Toolbox"},
+    "download_tools": ["subset_copernicus_dataset"],
+    "search_tools": ["search_copernicus_datasets", "describe_copernicus_dataset"],
+    "limitations": ["This summary is not a complete static inventory: query the live Copernicus catalogue.", "The server downloads bounded subsets; it does not calculate spatial or temporal averages or select depth levels.", "NetCDF and Zarr are supported; CSV depends on Toolbox support and the requested dataset."],
+    "references": ["https://data.marine.copernicus.eu/", "https://help.marine.copernicus.eu/en/articles/7949409-copernicus-marine-toolbox-introduction"],
+    "verified_on": "2026-09-28"
+  }
+]
