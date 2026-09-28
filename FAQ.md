@@ -186,6 +186,6 @@ New sources are added to this same server. Updating the project makes their tool
 
 ## How do I update it or fix a missing tool?
 
-If you cloned the repository, run `git pull` from its folder, then rerun `py -3 install.py` on Windows or `python3 install.py` on macOS/Linux. Your existing `.env` is preserved. If a new source needs extra credentials, copy its new field names from `.env.example` into `.env` and fill them in only if needed.
+If you cloned the repository, run `git pull` from its folder, then rerun `py -3 install.py` on Windows or `python3 install.py` on macOS/Linux. Your existing `.env` is preserved. If a new source needs extra credentials, copy its new field names from `.env.example` into `.env` and fill them in only if needed. For the existing Codex installation on Windows, follow the [step-by-step update instructions](README.md#update-the-mcp-in-codex-windows).
 
 If you downloaded a ZIP, download the latest ZIP and install from its extracted folder; transfer your private `.env` to that folder if you want to retain your credentials. After moving the folder, update the executable path in your MCP client using the newly generated `mcp-config.json`. If a tool is missing, verify that the executable exists in `.venv`, that the client points to its **absolute path**, and that you restarted the client. The first query for each FishStat collection may take longer while its FAO ZIP downloads.

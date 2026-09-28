@@ -2,7 +2,7 @@
 
 A local [Model Context Protocol](https://modelcontextprotocol.io/) server that connects your AI client to fisheries and marine data sources. Ask a research question, find relevant datasets, and download files with their units, structure and source information. Statistical analysis and joining datasets remain part of your research workflow.
 
-**[How to install](#how-to-install)** · [Data coverage](#current-coverage) · [FAQ](FAQ.md) · [Technical reference](docs/REFERENCE.md)
+**[How to install](#how-to-install)** · [Update Codex (Windows)](#update-the-mcp-in-codex-windows) · [Data coverage](#current-coverage) · [FAQ](FAQ.md) · [Technical reference](docs/REFERENCE.md)
 
 ## Current coverage
 
@@ -97,6 +97,30 @@ Restart the Codex extension or close and reopen Claude Code. Start a conversatio
 Downloads are saved by default to `~/fisheries-data-mcp/exports` with source metadata.
 
 For macOS/Linux, other clients and configuration options, see the [detailed installation guide](INSTALL.md).
+
+## Update the MCP in Codex (Windows)
+
+These steps update the existing installation in `C:\Users\adams\research\fisheries-data-mcp`, which Codex already uses. If you cloned the repository elsewhere, change the path in the first command.
+
+1. Close VS Code and Codex to release the MCP executable. Open a separate PowerShell window.
+2. Run these commands in order:
+
+   ```powershell
+   Set-Location 'C:\Users\adams\research\fisheries-data-mcp'
+   git pull --ff-only
+   py -3 install.py
+   ```
+
+3. Open the credentials file with `notepad .env`. Add this line with your UN Comtrade key, then save the file:
+
+   ```dotenv
+   UN_COMTRADE_API_KEY=your_key
+   ```
+
+   If the variable already exists, update its value instead of adding a duplicate.
+4. Reopen VS Code and Codex. The `search_comtrade_reference` and `comtrade_trade_records` tools should appear.
+
+The installer preserves `.env` and your existing keys. You do not need to change the MCP configuration because Codex still uses the executable in the same folder.
 
 ## Documentation
 
