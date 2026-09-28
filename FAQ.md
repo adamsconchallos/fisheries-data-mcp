@@ -94,6 +94,67 @@ Add an `mcpServers` entry with the **absolute path** to the executable you insta
 
 On macOS, the `command` is the absolute path ending in `/fisheries-data-mcp/.venv/bin/fisheries-data-mcp`. Replace the example path with your real path. If the file already has other servers, add this entry within its existing `mcpServers` object rather than replacing the file. Fully quit and reopen Claude Desktop, then check the available connectors/tools in **Chat**. The [MCP Python SDK guide](https://py.sdk.modelcontextprotocol.io/get-started/real-host/) explains these configuration paths and restart behavior.
 
+## How do data-source credentials reach the local server?
+
+Your AI client starts the MCP server as a process on your computer. The server reads BarentsWatch credentials from that process's environment. Copernicus Marine uses a separate login saved by its official Toolbox. **Do not paste either password or secret into an AI prompt.** FishStat needs no credentials.
+
+### BarentsWatch with Codex CLI on Windows
+
+First, register a [BarentsWatch API client](https://developer.barentswatch.no/docs/appreg/) and save its full client ID and secret. After you have registered this MCP with Codex, open `$HOME\.codex\config.toml` in Notepad with `notepad "$HOME\.codex\config.toml"`. Inside the existing `[mcp_servers.fisheries-data]` section, add this line so Codex forwards the variables to the server without saving their values in its configuration:
+
+```toml
+env_vars = ["BARENTSWATCH_CLIENT_ID", "BARENTSWATCH_CLIENT_SECRET"]
+```
+
+Then open PowerShell and enter:
+
+```powershell
+$env:BARENTSWATCH_CLIENT_ID = Read-Host "BarentsWatch client ID"
+$bwSecret = Read-Host "BarentsWatch client secret" -AsSecureString
+$env:BARENTSWATCH_CLIENT_SECRET = [System.Net.NetworkCredential]::new("", $bwSecret).Password
+codex
+```
+
+Start Codex from **that same PowerShell window**. The variables last for that session; enter them again in a new session. [OpenAI's MCP configuration guide](https://learn.chatgpt.com/docs/extend/mcp?surface=cli) documents `env_vars` for forwarding local environment variables to stdio servers.
+
+### BarentsWatch with Claude Desktop Chat
+
+In the existing `fisheries-data` entry in `claude_desktop_config.json`, add an `env` object:
+
+```json
+{
+  "mcpServers": {
+    "fisheries-data": {
+      "command": "C:\\Users\\YOUR_NAME\\path\\to\\fisheries-data-mcp\\.venv\\Scripts\\fisheries-data-mcp.exe",
+      "env": {
+        "BARENTSWATCH_CLIENT_ID": "YOUR_FULL_CLIENT_ID",
+        "BARENTSWATCH_CLIENT_SECRET": "YOUR_CLIENT_SECRET"
+      }
+    }
+  }
+}
+```
+
+Use your real executable path and credentials, then fully quit and reopen Claude Desktop. Its configuration file stores these values as readable text: keep it private and never upload it to GitHub. Variables set in an unrelated PowerShell window do not automatically reach Claude Desktop. The [MCP Python SDK guide](https://py.sdk.modelcontextprotocol.io/get-started/real-host/) explains how Desktop starts local servers.
+
+### Copernicus Marine
+
+After installing this project, run the Toolbox login **once** from the repository folder:
+
+**Windows PowerShell**
+
+```powershell
+.\.venv\Scripts\copernicusmarine.exe login
+```
+
+**macOS/Linux**
+
+```sh
+.venv/bin/copernicusmarine login
+```
+
+Enter your Copernicus Marine username or email and password when the Toolbox asks. It saves the credentials under your user account; this MCP checks them automatically before a download. You do not add them to the MCP client configuration. Catalogue search and dataset description do not require login. See the [Copernicus Marine credential guide](https://help.marine.copernicus.eu/en/articles/8185007-copernicus-marine-toolbox-credentials-configuration).
+
 ## Does the same setup work in Claude Cowork?
 
 **Not yet.** The `claude_desktop_config.json` entry above connects to Claude Desktop **Chat**, but [Anthropic says it is unavailable in Cowork](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp). Cowork needs a separately packaged plugin with a local MCP server in a compatible desktop session, or a hosted remote MCP server. This repository has not packaged or tested either Cowork route. See [Anthropic's plugin support guide](https://claude.com/docs/plugins/platform-support). If you want to use this repository now, use Codex CLI or Claude Desktop Chat.

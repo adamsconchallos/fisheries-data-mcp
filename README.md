@@ -76,7 +76,7 @@ The `fishstat_production_by_country` tool returns all matching country rows and 
    $env:BARENTSWATCH_CLIENT_SECRET = [System.Net.NetworkCredential]::new("", $bwSecret).Password
    ```
 
-   Start your MCP client from **that same session** so it inherits the variables. For a desktop app started separately, arrange for its process environment to contain the two variables before restarting it. Do not commit secrets to Git or a shared configuration file. The server requests OAuth tokens automatically.
+   For Codex CLI, add `env_vars = ["BARENTSWATCH_CLIENT_ID", "BARENTSWATCH_CLIENT_SECRET"]` inside the existing `[mcp_servers.fisheries-data]` section of `$HOME\.codex\config.toml`, then start Codex from **that same PowerShell session**. Claude Desktop Chat uses an `env` object in its local JSON configuration instead. See the [credential walkthrough](FAQ.md#how-do-data-source-credentials-reach-the-local-server) for both clients. Do not commit secrets to Git or a shared configuration file. The server requests OAuth tokens automatically.
 3. Ask for a **locality ID and year**, for example: “Use BarentsWatch to retrieve weekly adult female salmon lice for locality 35657 in 2022; export the CSV and cite the source.” The [official tutorial](https://developer.barentswatch.no/docs/tutorial/) uses this example ID. The current server does not search locality names; consult the [Fish Health API documentation](https://developer.barentswatch.no/docs/fishhealth/) or BarentsWatch site to identify an ID.
 
 ### Copernicus Marine
