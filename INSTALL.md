@@ -1,5 +1,7 @@
 # Install and connect Fisheries Data MCP
 
+For the six-step quick guide, start with [How to install](README.md#how-to-install). This page provides the detailed instructions and alternatives.
+
 These instructions use **Windows PowerShell**. You need Python 3.11 or newer and an AI application that can run a local MCP server. The server finds, describes and downloads data; it supplies files for your subsequent analysis.
 
 Client documentation checked on **28 September 2026**. For this repository's current local release:
@@ -8,6 +10,7 @@ Client documentation checked on **28 September 2026**. For this repository's cur
 | --- | --- |
 | Codex in VS Code | Add a local STDIO server in the Codex extension. |
 | Codex CLI | Register the executable with `codex mcp add`; see the [FAQ](FAQ.md#how-do-i-use-it-with-codex). |
+| Claude Code | Register the executable with `claude mcp add --scope user --transport stdio`; see below. |
 | Claude Desktop Chat | Add the generated entry to `claude_desktop_config.json`. |
 | Claude Cowork | Requires a compatible plugin or a remote deployment; neither is packaged by this repository yet. Use Desktop Chat for the current local setup. |
 | ChatGPT desktop app | Add a local STDIO server in Settings, where available in your app/workspace. |
@@ -125,6 +128,17 @@ command = 'C:\Users\YOUR_NAME\fisheries-data-mcp\.venv\Scripts\fisheries-data-mc
 ```
 
 Edit an existing entry of that name instead of duplicating it. Codex CLI and the extension share the same host configuration. These Windows paths assume Codex runs on Windows; a WSL or SSH session needs an installation and paths accessible in that environment. [OpenAI's configuration example](https://developers.openai.com/learn/docs-mcp).
+
+### Claude Code
+
+With Claude Code installed and signed in, run these commands in PowerShell from the repository folder:
+
+```powershell
+$mcpExe = (Resolve-Path ".venv\Scripts\fisheries-data-mcp.exe").Path
+claude mcp add --scope user --transport stdio fisheries-data -- "$mcpExe"
+```
+
+User scope makes the server available across your projects. The server reads the `.env` file beside `install.py`; you do not need to enter credentials in this command. Restart Claude Code, then enter `/mcp` to check that `fisheries-data` is connected. [Claude Code MCP documentation](https://code.claude.com/docs/en/mcp).
 
 ### Claude Desktop Chat, including users who downloaded Claude for Cowork
 

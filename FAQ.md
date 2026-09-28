@@ -1,6 +1,6 @@
 # Beginner FAQ and quick start
 
-For the complete sequence, use the [four-step installation guide](INSTALL.md): install Python, clone or download the repository, fill in `.env`, and connect your AI client. It includes Windows commands and the differences between Codex in VS Code, Claude Chat, Cowork and browser chats.
+Start with [How to install](README.md#how-to-install) for the six-step setup. The [detailed installation guide](INSTALL.md) includes additional options for Codex, Claude Code, Claude Desktop Chat, Cowork and browser chats.
 
 This guide is for researchers who want to ask questions through an AI client and receive source-backed fisheries data and CSV files. The server runs on **your computer**. The AI client starts it and discovers its tools.
 

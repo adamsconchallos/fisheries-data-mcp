@@ -2,6 +2,8 @@
 
 A local [Model Context Protocol](https://modelcontextprotocol.io/) server to **find, describe and download fisheries and marine data through natural-language requests**. Install it on your computer and connect it to an MCP-compatible AI client. The server delivers data files with source information and explains their structure so you can use them in your own research.
 
+**[How to install](#how-to-install)** · [Data coverage](#current-coverage) · [FAQ](FAQ.md)
+
 Its scope is data access and preparation: selecting records, downloading bounded subsets, and producing documented country totals where supported. Statistical analysis, modelling, scientific interpretation and joins between sources are outside the server's scope.
 
 ## Start with a research question
@@ -24,7 +26,7 @@ Catalogue descriptions and connected downloads are separate capabilities. An ent
 
 The catalogue guides discovery; it does not guarantee that every country, species, locality or year has an observation. Check the provider's records before promising a particular table. Copernicus also has a live catalogue search through `search_copernicus_datasets`.
 
-**New to GitHub or MCP?** Follow the [four-step installation guide](INSTALL.md): install Python, clone or download, fill in `.env`, and connect your AI client. It covers Codex in VS Code, Claude Desktop Chat, and the current limits for Cowork and browser chats. The [beginner FAQ](FAQ.md) covers updates and troubleshooting.
+**New to GitHub or MCP?** Start with [How to install](#how-to-install) below. The [detailed guide](INSTALL.md) covers additional clients and setup options; the [beginner FAQ](FAQ.md) covers updates and troubleshooting.
 
 ## Current coverage
 
@@ -62,43 +64,97 @@ Lice counts with `hasReportedLice=false` must not be treated as reported zeroes.
 
 The catalogue also documents other Fish Health and AquaInfo datasets, municipal statistics, vessel and fisheries services, and environmental observations or forecasts. Many of these are catalogue-only entries. The [BarentsWatch inventory notes](docs/BARENTSWATCH_DISCOVERY_NOTES.md) distinguish the reviewed services and API operations from the retrievals implemented and verified here.
 
-## Install locally
+## How to install
 
-Requires Python 3.11 or newer. Download or clone this repository, open a terminal in its folder, and run one command:
+These steps use **Windows PowerShell**. Have Codex or Claude Code installed and signed in. You do not need a GitHub account or the FishStat desktop application.
 
-The [installation guide](INSTALL.md#1-install-python-if-needed) provides the Python installation command and both GitHub download routes.
+### 1. Install Python
 
-**Windows PowerShell**
+Skip this step if you already have Python 3.11 or newer. Otherwise, open PowerShell and run:
+
+```powershell
+winget install --id Python.Python.3.13 -e
+```
+
+Close and reopen PowerShell. If WinGet is unavailable, use the [Python Windows installer](https://www.python.org/downloads/windows/).
+
+### 2. Download or clone this repository
+
+**Without Git:** select **Code → Download ZIP** on the [repository page](https://github.com/adamsconchallos/fisheries-data-mcp), extract the ZIP, and open PowerShell inside the extracted folder containing `install.py`.
+
+**With Git:** run:
+
+```powershell
+git clone https://github.com/adamsconchallos/fisheries-data-mcp.git
+cd fisheries-data-mcp
+```
+
+### 3. Install the MCP server
+
+From the repository folder, run:
 
 ```powershell
 py -3 install.py
 ```
 
-**macOS/Linux**
+The installer installs the server and dependencies, creates `.env` and `mcp-config.json`, and prints the **absolute executable path**. It preserves an existing `.env`.
 
-```bash
-python3 install.py
-```
+### 4. Add the server to your AI client
 
-The installer creates or reuses `.venv`, installs the server, creates an empty `.env` template if needed, and generates `mcp-config.json` with the correct absolute executable path. Rerunning it updates the package and preserves your existing `.env`.
+Choose one:
 
-Connect a client that supports local **stdio** MCP servers. If the client uses `mcpServers` JSON, copy the `fisheries-data` entry from the generated `mcp-config.json` into its configuration. If it asks for an executable, use the path printed by the installer. Configuration locations vary by client; the [FAQ](FAQ.md) explains the steps. Restart the client after adding the server.
+**Codex in VS Code:** open **⚙️ → MCP servers → Add server**. Use:
 
-If you use **Codex in VS Code**, follow its [extension setup](INSTALL.md#codex-in-vs-code); a separate CLI installation is optional.
+- Name: `fisheries-data`
+- Type: **STDIO**
+- Command: the executable path printed by the installer
+- Arguments: leave empty
 
-For **Codex CLI**, the [official MCP setup](https://developers.openai.com/learn/docs-mcp) uses `codex mcp add`. From the repository folder on Windows:
+Save the configuration. [Official Codex instructions](https://learn.chatgpt.com/docs/extend/mcp#configure-in-the-ide-extension).
+
+**Claude Code:** run these commands from the repository folder:
 
 ```powershell
-$server = (Resolve-Path .\.venv\Scripts\fisheries-data-mcp.exe).Path
-codex mcp add fisheries-data -- $server
-codex mcp list
+$mcpExe = (Resolve-Path ".venv\Scripts\fisheries-data-mcp.exe").Path
+claude mcp add --scope user --transport stdio fisheries-data -- "$mcpExe"
 ```
 
-For **Claude Desktop Chat**, add the entry from `mcp-config.json` to `claude_desktop_config.json` and restart the app. Preserve other entries if the file already exists. The [MCP Python SDK guide](https://py.sdk.modelcontextprotocol.io/get-started/real-host/) gives the configuration file locations for Windows and macOS. This JSON configuration does not connect the server to Claude Cowork; see the [FAQ](FAQ.md#does-the-same-setup-work-in-claude-cowork).
+This makes the server available across your projects. [Official Claude Code instructions](https://code.claude.com/docs/en/mcp).
 
-Try this prompt (Spanish or English):
+**Claude Cowork:** this repository does not yet provide a Cowork plugin or a remote server. Use Codex, Claude Code, or the [Claude Desktop Chat setup](INSTALL.md#claude-desktop-chat-including-users-who-downloaded-claude-for-cowork) for now. Cowork needs a [compatible plugin or remote connector](https://support.claude.com/en/articles/11725091-when-to-use-desktop-and-web-connectors).
 
-> ¿Qué países produjeron ostras en 2024 y cuántas toneladas produjo cada uno? Usa FishStat, incluye captura y acuicultura, exporta un CSV y cita la fuente y la definición de «ostras».
+For Codex CLI and other client options, see the [detailed installation guide](INSTALL.md).
+
+### 5. Add your data-source credentials
+
+From the same repository folder:
+
+```powershell
+notepad .env
+```
+
+Fill in only the sources you will use:
+
+```dotenv
+BARENTSWATCH_CLIENT_ID=your_client_id
+BARENTSWATCH_CLIENT_SECRET=your_client_secret
+COPERNICUSMARINE_SERVICE_USERNAME=your_username
+COPERNICUSMARINE_SERVICE_PASSWORD=your_password
+```
+
+Save `.env` **beside `install.py`**. FishStat needs no credentials; leave unused fields empty. The server reads this file automatically. See [Credentials](#credentials) below to create provider accounts.
+
+### 6. Restart and ask a question
+
+Restart the Codex extension, or close and reopen Claude Code. Start a new conversation:
+
+> Use Fisheries Data MCP. I want to study salmon production, production value and sea lice in Norway. Tell me which datasets are available, their periods and units, and which ones you can download.
+
+**macOS/Linux:** use Python 3.11 or newer, run `python3 install.py`, and use `.venv/bin/fisheries-data-mcp` as the server executable. See the [detailed guide](INSTALL.md) for client configuration.
+
+## Download examples
+
+> Which countries produced oysters in 2024, and how many tonnes did each produce? Use FishStat, include capture and aquaculture, export a CSV, and cite the source and definition of oysters.
 
 For aquaculture quantities and production values, try:
 
