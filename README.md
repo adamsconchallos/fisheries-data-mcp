@@ -10,11 +10,24 @@ Its scope is data access and preparation: selecting records, downloading bounded
 
 | Source | Available queries | Access |
 | --- | --- | --- |
-| [FAO FishStat Global Production](https://www.fao.org/fishery/static/Data/) | Search aquatic species; annual production tonnes by country, including oysters | The pinned 2026.1.0 ZIP is downloaded and cached on first use, or read from `FISHSTAT_ZIP` |
+| [FAO FishStat Global Production](https://www.fao.org/fishery/static/Data/GlobalProduction_2026.1.0.zip) | Search aquatic species; annual production tonnes by country, including oysters; select capture, aquaculture or both | The pinned 2026.1.0 ZIP is downloaded and cached on first use, or read from `FISHSTAT_ZIP` |
+| [FAO FishStat Global Aquaculture](https://www.fao.org/fishery/static/Data/Aquaculture_2026.1.0.zip) | Download aquaculture quantity and production-value records for a year range, preserving species, country, area, culture environment, measures, units and flags | A separate pinned 2026.1.0 ZIP is downloaded and cached on first use, or read from `FISHSTAT_AQUACULTURE_ZIP` |
 | [BarentsWatch Fish Health](https://developer.barentswatch.no/docs/fishhealth/) | Weekly mean adult female salmon lice for a Norwegian aquaculture locality and year | Your own registered API client ID and secret |
 | [Copernicus Marine](https://help.marine.copernicus.eu/en/articles/7949409-copernicus-marine-toolbox-introduction) | Search the live marine catalogue, describe variables and units, then download a bounded subset by variable, area and dates | Your own Copernicus Marine account |
 
 The sources describe different quantities and spatial scales, and each download retains its source and units. Current BarentsWatch coverage requires a locality ID; searching locality names is not yet provided. Comtrade is planned and is not yet connected.
+
+**FishStat contains multiple collections.** This server currently connects Global Production quantities and Global Aquaculture quantities and production values. It does not provide all FishStat collections. The production values in Global Aquaculture describe aquaculture production; they are not export values.
+
+### FishStat query tools
+
+- `search_fishstat_countries(query, limit=20)` finds FAO countries/areas by an English or Spanish name, UN code or ISO code. Use its exact FAO UN `country_code` to filter aquaculture records. Species searches are available through `search_fishstat_species`.
+- `fishstat_production_by_country(query, year, source="all", species_code="")` downloads a table of production quantities grouped by country for one year. This tool sums the selected source records and does not return production values.
+- `fishstat_aquaculture_records(query, start_year, end_year, country_code="", species_code="", measure="both")` downloads the selected aquaculture records for an inclusive year range. Each row retains the source dimensions and identifies its measure and unit. Quantity and production value are separate records, rather than a joined or aggregated table.
+
+The download tools return local files with provenance and a description of the table. The aquaculture CSV contains all matching rows; the tool response includes only the first 20 rows as a preview. The aquaculture tool preserves the source observations without calculating averages, growth rates or joins between measures or sources.
+
+In the pinned Global Aquaculture release, quantities (`Q_tlw`) cover 1950–2024 and are reported in tonnes: live weight for animals and wet weight for aquatic plants. Production values (`V_USD_1000`) cover 1984–2024 and are reported in **thousands of nominal US dollars**. The download preserves these units without converting values to dollars or adjusting for inflation. Coverage for an individual country or species can be narrower.
 
 ## Install locally
 
@@ -54,7 +67,11 @@ Try this prompt (Spanish or English):
 
 > ¿Qué países produjeron ostras en 2024 y cuántas toneladas produjo cada uno? Usa FishStat, incluye captura y acuicultura, exporta un CSV y cita la fuente y la definición de «ostras».
 
-The `fishstat_production_by_country` tool returns all matching country rows and writes a CSV plus a metadata JSON file. FishStat and BarentsWatch CSV exports list the actual columns and row count, with descriptions for their standard fields, units, missing values and data preparation. Copernicus returns dataset metadata; file structure depends on the dataset and format. `list_data_sources` describes available output structures before a download. By default, exports go to `~/fisheries-data-mcp/exports`; set `FISHERIES_MCP_OUTPUT_DIR` to choose another local directory. The server never requires an AI service account itself; a natural-language prompt requires an MCP-compatible AI client.
+For aquaculture quantities and production values, try:
+
+> Use FAO Global Aquaculture to download Norway's Atlantic salmon records for 2012–2024, including quantities and production values. Preserve the source records, units and flags, export a CSV, and explain what each row and column represents. Do not calculate averages or growth rates.
+
+The `fishstat_production_by_country` tool exports all matching country rows; `fishstat_aquaculture_records` exports all selected source records and returns a short preview. Both write a CSV plus a metadata JSON file. FishStat and BarentsWatch CSV exports list the actual columns and row count, with descriptions for their standard fields, units, missing values and data preparation. Copernicus returns dataset metadata; file structure depends on the dataset and format. `list_data_sources` describes available output structures before a download. By default, exports go to `~/fisheries-data-mcp/exports`; set `FISHERIES_MCP_OUTPUT_DIR` to choose another local directory. The server never requires an AI service account itself; a natural-language prompt requires an MCP-compatible AI client.
 
 ## Credentials
 
@@ -72,7 +89,14 @@ If you installed manually, copy `.env.example` to `.env` once, only if `.env` do
 
 `.env` is ignored by Git but stores secrets as plain text. Keep it private. If your repository is in a synced folder such as OneDrive, the file may sync too; use a local, unsynced clone for credentials or point `FISHERIES_MCP_ENV_FILE` to an absolute path outside the synced folder.
 
-**FishStat:** no account or `.env` entries are needed. On first use, the server downloads the pinned [FAO Global Production 2026.1.0 ZIP](https://www.fao.org/fishery/static/Data/GlobalProduction_2026.1.0.zip). To use an already downloaded copy or work offline, set `FISHSTAT_ZIP` to its absolute path before launching your AI client.
+**FishStat:** no account or credentials are needed. Each collection is downloaded and cached separately when first requested:
+
+| Collection | Pinned archive | Optional local-file environment variable |
+| --- | --- | --- |
+| Global Production quantities | [GlobalProduction_2026.1.0.zip](https://www.fao.org/fishery/static/Data/GlobalProduction_2026.1.0.zip) | `FISHSTAT_ZIP` |
+| Global Aquaculture quantities and production values | [Aquaculture_2026.1.0.zip](https://www.fao.org/fishery/static/Data/Aquaculture_2026.1.0.zip) | `FISHSTAT_AQUACULTURE_ZIP` |
+
+To use a downloaded copy or work offline, set the corresponding environment variable to its absolute path before launching your AI client. `FISHSTAT_ZIP` applies only to Global Production; it does not select the Aquaculture archive. These optional file paths are operating-system environment variables, not credential fields loaded from `.env`. The FishStat desktop application is not required.
 
 ### BarentsWatch
 
@@ -104,7 +128,8 @@ Copernicus Marine subsets are saved to `~/fisheries-data-mcp/exports` (or `FISHE
 
 ## Scientific use
 
-- FishStat production is annual tonnes: animals are reported in live weight and aquatic plants in wet weight. Country tables sum the selected records across species and areas; `source=all` combines capture and aquaculture. The server records this preparation, the release, selected species, source, and FAO quality flags. A suppressed or missing value is never interpreted as a real zero.
+- FishStat Global Production quantities are annual tonnes: animals are reported in live weight and aquatic plants in wet weight. Country tables sum the selected records across species and areas; `source=all` combines capture and aquaculture. The server records this preparation, the release, selected species, source, and FAO quality flags. A suppressed or missing value is never interpreted as a real zero.
+- FishStat Global Aquaculture exports preserve quantity and production-value observations, their units and flags, and the species, country, area, culture environment and year. Production values are in thousands of nominal US dollars. The export leaves `O` (missing) and `Q` (suppressed) values empty and retains their flags, even when the source stores a numeric zero; `N` (non-significant) values retain the reported zero. Production value must not be interpreted as export value, and the server does not calculate a price by dividing value by quantity.
 - BarentsWatch Fish Health provides raw reported data, which may contain errors. Missing weeks are not filled. Credit BarentsWatch and the original data owner. [API terms](https://www.barentswatch.no/en/articles/api-terms-and-conditions/).
 - Copernicus Marine results include the dataset ID and available product citation information. Cite the [product DOI](https://help.marine.copernicus.eu/en/articles/4444611-citing-copernicus-marine-products-and-services) and record the dataset version and query parameters.
 - The MIT license in this repository applies to the code. FAO data, BarentsWatch data, and Copernicus Marine products retain their own terms and attribution requirements. [FAO terms](https://www.fao.org/contact-us/terms/db-terms-of-use/en/).

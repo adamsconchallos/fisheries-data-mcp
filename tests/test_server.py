@@ -33,6 +33,8 @@ class ServerTests(unittest.IsolatedAsyncioTestCase):
         async with Client(params) as client:
             names = {tool.name for tool in (await client.list_tools()).tools}
         self.assertIn("fishstat_production_by_country", names)
+        self.assertIn("fishstat_aquaculture_records", names)
+        self.assertIn("search_fishstat_countries", names)
         self.assertIn("describe_copernicus_dataset", names)
 
     async def test_fishstat_query_is_discoverable_and_exports_csv(self):

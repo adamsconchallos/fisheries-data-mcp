@@ -1,4 +1,4 @@
-"""Read FAO FishStat Global Production without requiring FishStatJ or pandas.
+"""Read FAO FishStat Global Production and Aquaculture without FishStatJ or pandas.
 
 The ZIP is downloaded on first use into the user's data directory. Set
 ``FISHSTAT_ZIP`` to an existing copy to work offline or pin a local file.
@@ -25,6 +25,33 @@ DATASET_VERSION = "2026.1.0"
 ZIP_NAME = f"GlobalProduction_{DATASET_VERSION}.zip"
 SOURCE_URL = f"https://www.fao.org/fishery/static/Data/{ZIP_NAME}"
 MEASURE = "Q_tlw"  # FAO's quantity code; plants are reported in wet weight.
+AQUACULTURE_ZIP_NAME = f"Aquaculture_{DATASET_VERSION}.zip"
+AQUACULTURE_SOURCE_URL = f"https://www.fao.org/fishery/static/Data/{AQUACULTURE_ZIP_NAME}"
+AQUACULTURE_FILES = {
+    "quantity": ("Aquaculture_Quantity.csv", "Q_tlw"),
+    "value": ("Aquaculture_Value.csv", "V_USD_1000"),
+}
+AQUACULTURE_COVERAGE = {"quantity": [1950, 2024], "value": [1984, 2024]}
+AQUACULTURE_TABLE_STRUCTURE = {
+    "row_definition": "One original observation per country, species, FAO area, culture environment, year and measure. Quantity and monetary value occupy separate rows.",
+    "column_descriptions": {
+        "country": "FAO country/area name.",
+        "country_code": "FAO UN country/area code; retain as text.",
+        "species": "English species name, with scientific-name fallback.",
+        "species_code": "ASFIS three-letter species item code.",
+        "scientific_name": "Scientific name supplied by FAO.",
+        "area_code": "FAO major fishing area code; retain as text.",
+        "environment_code": "FAO culture environment code.",
+        "environment": "FAO culture environment name.",
+        "year": "Production year.",
+        "measure": "Q_tlw for production quantity; V_USD_1000 for production value.",
+        "value": "Observation in the stated unit. Monetary values retain the source scale of thousands of USD.",
+        "unit": "Tonnes live weight for aquatic animals, tonnes wet weight for plants, or thousands of USD.",
+        "status": "Original FAO observation flag; see status_legend.",
+    },
+    "preparation": "Filter the two Aquaculture tables and append their records in long format, adding reference labels. Preserve source dimensions, units and flags; no summation, joining, inflation adjustment or growth calculation.",
+    "missing_values": "L, M, O, Q and blank source values become empty CSV cells. Reported zeroes and N flags are retained. Missing observations are not filled; quantity and value can have different coverage.",
+}
 
 TABLE_STRUCTURE = {
     "row_definition": "One FAO country/area for the requested year and species/source selection.",
@@ -75,9 +102,12 @@ def _fold(value: str) -> str:
     ).strip()
 
 
-def _validate_archive(archive: zipfile.ZipFile) -> None:
-    required = (
-        "Global_production_quantity.csv",
+def _validate_archive(archive: zipfile.ZipFile, collection: str = "GlobalProduction") -> None:
+    data_files = (
+        ("Aquaculture_Quantity.csv", "Aquaculture_Value.csv", "CL_FI_PRODENVIRONMENT.csv", "CL_FI_SYMBOL_SDMX.csv")
+        if collection == "Aquaculture" else ("Global_production_quantity.csv",)
+    )
+    required = (*data_files,
         "CL_FI_SPECIES_GROUPS.csv",
         "CL_FI_COUNTRY_GROUPS.csv",
         "CL_History.txt",
@@ -90,18 +120,22 @@ def _validate_archive(archive: zipfile.ZipFile) -> None:
         if "release of Aquaculture/Capture/GlobalProduction" in line
     ]
     if not releases or releases[-1].split()[0] != DATASET_VERSION:
-        raise ValueError(f"Expected FishStat Global Production release {DATASET_VERSION}")
+        label = "Aquaculture" if collection == "Aquaculture" else "Global Production"
+        raise ValueError(f"Expected FishStat {label} release {DATASET_VERSION}")
 
 
-def _provenance() -> dict:
+def _provenance(collection: str = "GlobalProduction") -> dict:
     accessed = date.today()
     access_label = f"{accessed.day} {calendar.month_name[accessed.month]} {accessed.year}"
     return {
         "dataset_version": DATASET_VERSION,
-        "source_url": SOURCE_URL,
+        "collection": collection,
+        "source_url": AQUACULTURE_SOURCE_URL if collection == "Aquaculture" else SOURCE_URL,
         "accessed_on": accessed.isoformat(),
         "citation": (
-            "FAO. 2026. FishStat: Global production by production source 1950-2024. "
+            ("FAO. 2026. FishStat: Global aquaculture production 1950-2024. "
+             if collection == "Aquaculture" else
+             "FAO. 2026. FishStat: Global production by production source 1950-2024. ") +
             f"[Accessed on {access_label}]. In: FishStatJ. Available at "
             "https://www.fao.org/fishery/en/statistics/software/fishstatj. "
             "Licence: CC-BY-4.0."
@@ -109,17 +143,21 @@ def _provenance() -> dict:
     }
 
 
-def _zip_path() -> Path:
-    override = os.getenv("FISHSTAT_ZIP")
+def _zip_path(collection: str = "GlobalProduction") -> Path:
+    aquaculture = collection == "Aquaculture"
+    env_name = "FISHSTAT_AQUACULTURE_ZIP" if aquaculture else "FISHSTAT_ZIP"
+    zip_name = AQUACULTURE_ZIP_NAME if aquaculture else ZIP_NAME
+    source_url = AQUACULTURE_SOURCE_URL if aquaculture else SOURCE_URL
+    override = os.getenv(env_name)
     if override:
         path = Path(override).expanduser()
         if not path.is_file():
-            raise FileNotFoundError(f"FISHSTAT_ZIP does not exist: {path}")
+            raise FileNotFoundError(f"{env_name} does not exist: {path}")
         return path
 
     base = os.getenv("LOCALAPPDATA") or os.getenv("XDG_DATA_HOME")
     data_dir = Path(base) if base else Path.home() / ".local" / "share"
-    path = data_dir / "fisheries_data_mcp" / ZIP_NAME
+    path = data_dir / "fisheries_data_mcp" / zip_name
     if path.is_file():
         return path
 
@@ -127,17 +165,22 @@ def _zip_path() -> Path:
     temporary: Path | None = None
     try:
         try:
-            with urllib.request.urlopen(SOURCE_URL, timeout=60) as response:
+            request = urllib.request.Request(source_url, headers={
+                "User-Agent": "Mozilla/5.0",
+                "Accept": "*/*",
+                "Referer": "https://www.fao.org/fishery/static/Data/",
+            })
+            with urllib.request.urlopen(request, timeout=60) as response:
                 with tempfile.NamedTemporaryFile(dir=path.parent, delete=False) as target:
                     temporary = Path(target.name)
                     shutil.copyfileobj(response, target)
         except OSError as exc:
             raise RuntimeError(
-                f"Could not download FishStat from {SOURCE_URL}. "
-                "Download the ZIP in a browser and set FISHSTAT_ZIP to its local path."
+                f"Could not download FishStat from {source_url}. "
+                f"Download the ZIP in a browser and set {env_name} to its local path."
             ) from exc
         with zipfile.ZipFile(temporary) as archive:
-            _validate_archive(archive)
+            _validate_archive(archive, collection)
         temporary.replace(path)
     finally:
         if temporary is not None:
@@ -206,6 +249,126 @@ def search_species(query: str, limit: int = 20) -> dict:
         "species": [_species_summary(row) for row in matches[:limit]],
         **_provenance(),
     }
+
+
+def search_countries(query: str, limit: int = 20) -> dict:
+    """Resolve a country name or UN/ISO code using the Aquaculture reference list."""
+    folded = _fold(query)
+    if not folded or limit < 1:
+        raise ValueError("Give a country name or code and a positive limit.")
+    with zipfile.ZipFile(_zip_path("Aquaculture")) as archive:
+        _validate_archive(archive, "Aquaculture")
+        countries = list(_rows(archive, "CL_FI_COUNTRY_GROUPS.csv"))
+        matches = [
+            row for row in countries
+            if any(folded == _fold(row.get(field, "")) for field in ("UN_Code", "ISO2_Code", "ISO3_Code"))
+        ]
+        if not matches:
+            matches = [row for row in countries if any(
+                folded in _fold(row.get(field, "")) for field in ("Name_En", "Name_Es", "Name_Fr")
+            )]
+    matches.sort(key=lambda row: row["Name_En"])
+    return {
+        "query": query,
+        "total_matches": len(matches),
+        "countries": [
+            {"country_code": row["UN_Code"], "name_en": row["Name_En"],
+             "name_es": row.get("Name_Es", ""), "iso3_code": row.get("ISO3_Code", "")}
+            for row in matches[:limit]
+        ],
+        "note": "Reference-list membership does not guarantee observations for a requested species and period.",
+        **_provenance("Aquaculture"),
+    }
+
+
+def aquaculture_records(
+    query: str,
+    start_year: int,
+    end_year: int,
+    country_code: str = "",
+    species_code: str = "",
+    measure: str = "both",
+) -> dict:
+    """Select original aquaculture quantity/value records, retaining every source dimension."""
+    if measure not in ("quantity", "value", "both"):
+        raise ValueError("measure must be 'quantity', 'value', or 'both'")
+    if (type(start_year) is not int or type(end_year) is not int
+            or not 1950 <= start_year <= end_year <= 2024):
+        raise ValueError("Choose start_year <= end_year within the 1950-2024 release coverage.")
+    country_code = country_code.strip()
+    selected_measures = list(AQUACULTURE_FILES) if measure == "both" else [measure]
+    result = {
+        "query": query,
+        "start_year": start_year,
+        "end_year": end_year,
+        "country_code": country_code,
+        "requested_measure": measure,
+        "selection_rule": _selection_rule(query, species_code or None),
+        "coverage": AQUACULTURE_COVERAGE,
+        "table_structure": AQUACULTURE_TABLE_STRUCTURE,
+        "value_basis": "Nominal aquaculture production value in thousands of USD, as supplied by FAO; no currency conversion or inflation adjustment by this server.",
+        **_provenance("Aquaculture"),
+        "species": [],
+        "rows": [],
+        "status_legend": {},
+        "warnings": [],
+    }
+    if "value" in selected_measures and start_year < 1984:
+        result["warnings"].append("Aquaculture production values cover 1984-2024; earlier years are not filled.")
+    with zipfile.ZipFile(_zip_path("Aquaculture")) as archive:
+        _validate_archive(archive, "Aquaculture")
+        countries = {row["UN_Code"]: row["Name_En"] for row in _rows(archive, "CL_FI_COUNTRY_GROUPS.csv")}
+        if country_code and country_code not in countries:
+            raise ValueError("Unknown FAO UN country_code. Use search_fishstat_countries to resolve the country.")
+        species = _matched_species(list(_rows(archive, "CL_FI_SPECIES_GROUPS.csv")), query, species_code or None)
+        if not species:
+            result["warnings"].append("No matching species item in the FishStat reference list.")
+            return result
+        by_species = {row["3A_Code"]: row for row in species}
+        environments = {row["Code"]: row["Name_En"] for row in _rows(archive, "CL_FI_PRODENVIRONMENT.csv")}
+        symbols = {row["Symbol"]: row["Name_En"] for row in _rows(archive, "CL_FI_SYMBOL_SDMX.csv")}
+        observed_species = set()
+        observed_flags = set()
+        for selection in selected_measures:
+            filename, expected_measure = AQUACULTURE_FILES[selection]
+            for row in _rows(archive, filename):
+                if (row["SPECIES.ALPHA_3_CODE"] not in by_species
+                        or not start_year <= int(row["PERIOD"]) <= end_year
+                        or (country_code and row["COUNTRY.UN_CODE"] != country_code)):
+                    continue
+                if row["MEASURE"] != expected_measure:
+                    raise ValueError(f"Unexpected measure in {filename}: {row['MEASURE']}")
+                item = by_species[row["SPECIES.ALPHA_3_CODE"]]
+                unit = ("thousands of USD" if selection == "value" else
+                        "tonnes wet weight" if item["Major_Group"] == "PLANTAE AQUATICAE" else
+                        "tonnes live weight")
+                status = row["STATUS"]
+                missing = status in {"L", "M", "O", "Q"} or not row["VALUE"].strip()
+                result["rows"].append({
+                    "country": countries.get(row["COUNTRY.UN_CODE"], row["COUNTRY.UN_CODE"]),
+                    "country_code": row["COUNTRY.UN_CODE"],
+                    "species": item["Name_En"] or item["Scientific_Name"],
+                    "species_code": item["3A_Code"],
+                    "scientific_name": item["Scientific_Name"],
+                    "area_code": row["AREA.CODE"],
+                    "environment_code": row["ENVIRONMENT.ALPHA_2_CODE"],
+                    "environment": environments.get(row["ENVIRONMENT.ALPHA_2_CODE"], row["ENVIRONMENT.ALPHA_2_CODE"]),
+                    "year": int(row["PERIOD"]),
+                    "measure": expected_measure,
+                    "value": None if missing else float(Decimal(row["VALUE"])),
+                    "unit": unit,
+                    "status": status,
+                })
+                observed_species.add(item["3A_Code"])
+                observed_flags.add(status)
+        result["species"] = [_species_summary(item) for item in species if item["3A_Code"] in observed_species]
+        result["status_legend"] = {flag: symbols.get(flag, "Unspecified source flag") for flag in sorted(observed_flags)}
+    result["rows"].sort(key=lambda row: (
+        row["country_code"], row["species_code"], row["year"], row["area_code"], row["environment_code"], row["measure"]
+    ))
+    if not result["rows"]:
+        result["warnings"].append("No observations for the selected country, species, period and measure.")
+    return result
 
 
 def production_by_country(

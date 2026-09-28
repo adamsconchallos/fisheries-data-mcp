@@ -18,6 +18,21 @@ The server finds, describes and downloads data. It explains columns, units and d
 
 FishStat needs no data-source account. BarentsWatch and Copernicus Marine need their own credentials for the relevant tools; see the [README](README.md#credentials). You can start with FishStat and add those credentials later.
 
+## Does the server provide all FishStat data?
+
+No. FishStat contains several collections, and the current server connects two:
+
+| Connected collection | What the server downloads |
+| --- | --- |
+| Global Production | Production quantities grouped by country for one year; choose capture, aquaculture or both. |
+| Global Aquaculture | Quantity and production-value records for a year range, preserving species, country, area, culture environment, measure, unit and status. |
+
+Other FishStat collections are not yet connected. Global Production's country tool returns quantities only. Use `fishstat_aquaculture_records` when you need aquaculture production values, including a request for both quantities and values. These are production values, not the value of exports.
+
+For the pinned Global Aquaculture release, quantities cover 1950–2024 in tonnes (live weight for animals; wet weight for aquatic plants). Production values cover 1984–2024 in **thousands of nominal US dollars**. Individual country/species series can have gaps or shorter coverage. The server preserves the units; it does not adjust for inflation or convert the value to a price. Missing (`O`) and suppressed (`Q`) values are exported as empty fields with their flags retained, even if their source field contains `0`. Non-significant (`N`) values keep the reported zero.
+
+Both collections are available without credentials or the FishStat desktop application. The server downloads `GlobalProduction_2026.1.0.zip` and `Aquaculture_2026.1.0.zip` into separate cache files when you first request each collection. For an existing local copy, set `FISHSTAT_ZIP` for Global Production or `FISHSTAT_AQUACULTURE_ZIP` for Global Aquaculture to the corresponding archive's absolute path before starting the AI client. These optional paths are operating-system environment variables; the credential `.env` loader does not read them.
+
 ## How do I get the files?
 
 **Option A: Clone with Git.** Install [Git](https://git-scm.com/downloads), open a terminal in the folder where you want the project, and run:
@@ -49,7 +64,7 @@ py -3 install.py
 python3 install.py
 ```
 
-The installer prepares the `.venv` environment and downloads Python dependencies. It also creates `.env` for optional credentials and `mcp-config.json` with your server's absolute path. Existing `.env` credentials are preserved when you rerun it. The first FishStat query downloads and caches the FAO data ZIP. You do **not** need the FishStat desktop `.exe`.
+The installer prepares the `.venv` environment and downloads Python dependencies. It also creates `.env` for optional credentials and `mcp-config.json` with your server's absolute path. Existing `.env` credentials are preserved when you rerun it. The first query for each connected FishStat collection downloads and caches its FAO data ZIP separately. You do **not** need the FishStat desktop `.exe`.
 
 ## How do I use it with Codex in VS Code?
 
@@ -133,9 +148,15 @@ For a first query, ask your connected AI client:
 
 > Use FishStat to find oyster production by country in 2024. Include capture and aquaculture, report tonnes, export the results to CSV, and cite the data release and species definition.
 
-The FishStat tool writes a CSV and a metadata JSON file, by default under `~/fisheries-data-mcp/exports`. You can set `FISHERIES_MCP_OUTPUT_DIR` to choose another folder. The [README](README.md#current-coverage) lists the current tools and the extra credentials needed for BarentsWatch and Copernicus Marine.
+For aquaculture quantities and production values, ask:
 
-You can also ask: "Before downloading, explain what each row and column represents, the units and the available years." FishStat and BarentsWatch CSV exports list the actual columns and row count, with descriptions for their standard fields. FishStat's country table groups and sums the selected source records; BarentsWatch preserves the provider's reported weekly means. Copernicus downloads a subset without calculating averages and returns dataset metadata; its file structure varies by dataset and format.
+> Use FAO Global Aquaculture to download Norway's Atlantic salmon records for 2012–2024. Include both quantities and production values, preserve the source records and flags, and export a CSV with the source and units. Explain the table structure without calculating averages or growth rates.
+
+The AI client can call `fishstat_aquaculture_records(query, start_year, end_year, country_code="", species_code="", measure="both")` to fulfill this request. It can first look up the exact country code using `search_fishstat_countries(query, limit=20)`, which accepts English or Spanish country names and UN or ISO codes. Its long-format table keeps quantities and production values as separate rows, with their source dimensions, measure and unit. The CSV contains all matching rows, while the tool response previews the first 20. It does not join the two measures or calculate a price.
+
+The FishStat tools write a CSV and a metadata JSON file, by default under `~/fisheries-data-mcp/exports`. You can set `FISHERIES_MCP_OUTPUT_DIR` to choose another folder. The [README](README.md#current-coverage) lists the current tools and the extra credentials needed for BarentsWatch and Copernicus Marine.
+
+You can also ask: "Before downloading, explain what each row and column represents, the units and the available years." FishStat and BarentsWatch CSV exports list the actual columns and row count, with descriptions for their standard fields. FishStat's Global Production country table groups and sums the selected source records; its Global Aquaculture table preserves the selected observations. BarentsWatch preserves the provider's reported weekly means. Copernicus downloads a subset without calculating averages and returns dataset metadata; its file structure varies by dataset and format.
 
 ## Will adding more sources require a new installation for each one?
 
@@ -145,4 +166,4 @@ New sources will be added to this same server. Updating the project will make th
 
 If you cloned the repository, run `git pull` from its folder, then rerun `py -3 install.py` on Windows or `python3 install.py` on macOS/Linux. Your existing `.env` is preserved. If a new source needs extra credentials, copy its new field names from `.env.example` into `.env` and fill them in only if needed.
 
-If you downloaded a ZIP, download the latest ZIP and install from its extracted folder; transfer your private `.env` to that folder if you want to retain your credentials. After moving the folder, update the executable path in your MCP client using the newly generated `mcp-config.json`. If a tool is missing, verify that the executable exists in `.venv`, that the client points to its **absolute path**, and that you restarted the client. The first FishStat query may take longer while the FAO ZIP downloads.
+If you downloaded a ZIP, download the latest ZIP and install from its extracted folder; transfer your private `.env` to that folder if you want to retain your credentials. After moving the folder, update the executable path in your MCP client using the newly generated `mcp-config.json`. If a tool is missing, verify that the executable exists in `.venv`, that the client points to its **absolute path**, and that you restarted the client. The first query for each FishStat collection may take longer while its FAO ZIP downloads.

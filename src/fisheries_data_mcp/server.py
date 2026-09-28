@@ -22,12 +22,15 @@ mcp = MCPServer(
     instructions=(
         "Find, describe and download fisheries and marine datasets. "
         "Use list_data_sources to check coverage and output structure. "
+        "For a research question, identify relevant datasets and gaps before downloading. "
         "Clarify ambiguous species, countries, periods, variables or table structure before downloading. "
         "Explain the delivered fields, units, selection, missing values and source citation. "
         "FishStat country totals are documented query aggregations. "
         "This server supplies data for subsequent analysis; it does not fit models, test hypotheses, "
         "interpret scientific results or join data sources. State when a requested dataset or table "
-        "structure is unsupported instead of inventing data."
+        "structure is unsupported instead of inventing data. "
+        "FishStat comprises multiple collections: this server connects Global Production quantities "
+        "and Aquaculture quantities and monetary production values; it does not cover all FishStat."
     ),
 )
 
@@ -90,6 +93,21 @@ def list_data_sources() -> dict:
                 "tools": ["search_fishstat_species", "fishstat_production_by_country"],
                 "url": "https://www.fao.org/fishery/static/Data/",
                 "table_structure": fishstat.TABLE_STRUCTURE,
+                "limitations": "This collection supplies quantities only. Use fishstat_aquaculture_records for aquaculture monetary production values. Other FishStat collections are not connected.",
+            },
+            {
+                "id": "fishstat_aquaculture",
+                "name": "FAO FishStat Global Aquaculture Production",
+                "covers": "Annual aquaculture quantity and monetary production value by country, species, FAO area and culture environment, release 2026.1.0.",
+                "coverage": fishstat.AQUACULTURE_COVERAGE,
+                "variables": {
+                    "Q_tlw": "Tonnes live weight for animals; tonnes wet weight for plants.",
+                    "V_USD_1000": "Nominal production value in thousands of USD; not an export value or a price per tonne.",
+                },
+                "tools": ["search_fishstat_countries", "search_fishstat_species", "fishstat_aquaculture_records"],
+                "url": fishstat.AQUACULTURE_SOURCE_URL,
+                "table_structure": fishstat.AQUACULTURE_TABLE_STRUCTURE,
+                "limitations": "Actual country/species coverage must be checked in the returned records. Quantity and value are separate rows; missing observations are not filled. No capture-fisheries monetary values.",
             },
             {
                 "id": "barentswatch",
@@ -117,6 +135,32 @@ def search_fishstat_species(query: str, limit: int = 20) -> dict:
     """Find FishStat aquatic species or species groups by name or code, including oysters/ostras."""
     try:
         return fishstat.search_species(query, limit)
+    except Exception as exc:
+        raise _tool_error(exc) from exc
+
+
+@mcp.tool()
+def search_fishstat_countries(query: str, limit: int = 20) -> dict:
+    """Find exact FAO country codes by English, Spanish or French name or UN/ISO code before selecting aquaculture records."""
+    try:
+        return fishstat.search_countries(query, limit)
+    except Exception as exc:
+        raise _tool_error(exc) from exc
+
+
+@mcp.tool()
+def fishstat_aquaculture_records(
+    query: str, start_year: int, end_year: int, country_code: str = "",
+    species_code: str = "", measure: str = "both",
+) -> dict:
+    """Download original FAO aquaculture records: quantity (1950-2024), value (1984-2024), or both. Values are nominal thousands of USD. Resolve country_code with search_fishstat_countries; empty selects all countries. Optionally select exact ASFIS species_code. Preserve country/species/area/environment/year/measure and quality flags; no aggregation or joins. Returns complete CSV and metadata paths and up to 20 preview rows."""
+    try:
+        result = fishstat.aquaculture_records(query, start_year, end_year, country_code, species_code, measure)
+        rows = result.pop("rows")
+        result.update(_export_rows(rows, result, f"fishstat-aquaculture-{country_code or 'all'}-{start_year}-{end_year}"))
+        result["row_count"] = len(rows)
+        result["rows_preview"] = rows[:20]
+        return result
     except Exception as exc:
         raise _tool_error(exc) from exc
 
