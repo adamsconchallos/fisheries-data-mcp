@@ -1,7 +1,7 @@
 """Bounded Copernicus Marine catalogue searches and data downloads.
 
-Uses the official Copernicus Marine Toolbox; credentials remain in its local
-configuration (set up once with ``copernicusmarine login``).
+Uses the official Copernicus Marine Toolbox with credentials from the project's
+``.env`` file or a saved ``copernicusmarine login``.
 """
 
 from __future__ import annotations
@@ -226,7 +226,10 @@ def subset_dataset(
     except Exception:
         authenticated = False
     if not authenticated:
-        raise RuntimeError("Copernicus Marine credentials are unavailable or invalid; run 'copernicusmarine login' locally")
+        raise RuntimeError(
+            "Copernicus Marine credentials are unavailable or invalid; "
+            "set them in the project's .env or run 'copernicusmarine login' locally"
+        )
 
     directory = Path(output_dir).expanduser().resolve()
     request = dict(

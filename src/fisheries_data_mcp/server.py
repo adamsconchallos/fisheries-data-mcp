@@ -11,6 +11,9 @@ from uuid import uuid4
 from mcp.server import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 
+from .settings import load_local_credentials
+
+load_local_credentials()  # Copernicus Marine reads environment credentials during import.
 from . import barentswatch, copernicus, fishstat
 
 

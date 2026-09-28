@@ -96,64 +96,35 @@ On macOS, the `command` is the absolute path ending in `/fisheries-data-mcp/.ven
 
 ## How do data-source credentials reach the local server?
 
-Your AI client starts the MCP server as a process on your computer. The server reads BarentsWatch credentials from that process's environment. Copernicus Marine uses a separate login saved by its official Toolbox. **Do not paste either password or secret into an AI prompt.** FishStat needs no credentials.
+The MCP server reads a `.env` file from this repository when your AI client starts it. You do not need to put credentials in Codex's `config.toml`, Claude Desktop's JSON, or an AI prompt. FishStat needs no credentials.
 
-### BarentsWatch with Codex CLI on Windows
-
-First, register a [BarentsWatch API client](https://developer.barentswatch.no/docs/appreg/) and save its full client ID and secret. After you have registered this MCP with Codex, open `$HOME\.codex\config.toml` in Notepad with `notepad "$HOME\.codex\config.toml"`. Inside the existing `[mcp_servers.fisheries-data]` section, add this line so Codex forwards the variables to the server without saving their values in its configuration:
-
-```toml
-env_vars = ["BARENTSWATCH_CLIENT_ID", "BARENTSWATCH_CLIENT_SECRET"]
-```
-
-Then open PowerShell and enter:
-
-```powershell
-$env:BARENTSWATCH_CLIENT_ID = Read-Host "BarentsWatch client ID"
-$bwSecret = Read-Host "BarentsWatch client secret" -AsSecureString
-$env:BARENTSWATCH_CLIENT_SECRET = [System.Net.NetworkCredential]::new("", $bwSecret).Password
-codex
-```
-
-Start Codex from **that same PowerShell window**. The variables last for that session; enter them again in a new session. [OpenAI's MCP configuration guide](https://learn.chatgpt.com/docs/extend/mcp?surface=cli) documents `env_vars` for forwarding local environment variables to stdio servers.
-
-### BarentsWatch with Claude Desktop Chat
-
-In the existing `fisheries-data` entry in `claude_desktop_config.json`, add an `env` object:
-
-```json
-{
-  "mcpServers": {
-    "fisheries-data": {
-      "command": "C:\\Users\\YOUR_NAME\\path\\to\\fisheries-data-mcp\\.venv\\Scripts\\fisheries-data-mcp.exe",
-      "env": {
-        "BARENTSWATCH_CLIENT_ID": "YOUR_FULL_CLIENT_ID",
-        "BARENTSWATCH_CLIENT_SECRET": "YOUR_CLIENT_SECRET"
-      }
-    }
-  }
-}
-```
-
-Use your real executable path and credentials, then fully quit and reopen Claude Desktop. Its configuration file stores these values as readable text: keep it private and never upload it to GitHub. Variables set in an unrelated PowerShell window do not automatically reach Claude Desktop. The [MCP Python SDK guide](https://py.sdk.modelcontextprotocol.io/get-started/real-host/) explains how Desktop starts local servers.
-
-### Copernicus Marine
-
-After installing this project, run the Toolbox login **once** from the repository folder:
+From the repository folder, make a private copy of the example file:
 
 **Windows PowerShell**
 
 ```powershell
-.\.venv\Scripts\copernicusmarine.exe login
+Copy-Item .env.example .env
+notepad .env
 ```
 
 **macOS/Linux**
 
 ```sh
-.venv/bin/copernicusmarine login
+cp .env.example .env
 ```
 
-Enter your Copernicus Marine username or email and password when the Toolbox asks. It saves the credentials under your user account; this MCP checks them automatically before a download. You do not add them to the MCP client configuration. Catalogue search and dataset description do not require login. See the [Copernicus Marine credential guide](https://help.marine.copernicus.eu/en/articles/8185007-copernicus-marine-toolbox-credentials-configuration).
+Open `.env` in a text editor on macOS/Linux. Fill in only the sources you want to use; the empty lines are ignored:
+
+```dotenv
+BARENTSWATCH_CLIENT_ID=your_full_client_id
+BARENTSWATCH_CLIENT_SECRET=your_client_secret
+COPERNICUSMARINE_SERVICE_USERNAME=your_username_or_email
+COPERNICUSMARINE_SERVICE_PASSWORD=your_password
+```
+
+Register a [BarentsWatch API client](https://developer.barentswatch.no/docs/appreg/) to obtain its ID and secret. Create a [Copernicus Marine account](https://help.marine.copernicus.eu/en/articles/4220332-how-to-register-for-copernicus-marine-service) for its username and password. You can leave either pair empty until you need that source. If the official Copernicus Toolbox has already saved your credentials through `copernicusmarine login`, leave its `.env` lines empty. Catalogue searches and dataset descriptions do not need a Copernicus login; downloads do.
+
+Save `.env` and fully restart Codex or Claude Desktop Chat. The server locates the file next to the project's `.venv`, regardless of the AI client's working directory. Existing operating-system environment variables take precedence. The `.env` file is ignored by Git but contains plain-text secrets; keep it private. If the repository is in OneDrive or another synced folder, `.env` may sync too. You can keep credentials in a local, unsynced clone, or set `FISHERIES_MCP_ENV_FILE` to the absolute path of a private `.env` elsewhere.
 
 ## Does the same setup work in Claude Cowork?
 
