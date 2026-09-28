@@ -11,4 +11,5 @@ exports/
 *.nc
 *.zarr/
 .env
+mcp-config.json
 *.metadata.json

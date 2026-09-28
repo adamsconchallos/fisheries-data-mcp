@@ -283,6 +283,8 @@ def subset_dataset(
         "product_id": product_id, "product_title": product.title,
         "product_doi": getattr(product, "digital_object_identifier", None),
         "variable": variable, "unit": getattr(available[variable], "units", None),
+        "standard_name": getattr(available[variable], "standard_name", None),
+        "structure_note": "Subset of the selected variable over the requested area and dates, retaining source coordinate dimensions. File layout depends on the dataset and format; no spatial or temporal averages are computed. This tool does not select a depth level.",
         "estimated_file_size_mb": getattr(preview, "file_size", None),
         "estimated_transfer_mb": getattr(preview, "data_transfer_size", None),
         "source_url": f"https://data.marine.copernicus.eu/product/{product_id}/description",

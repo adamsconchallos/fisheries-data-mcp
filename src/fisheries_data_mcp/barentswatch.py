@@ -16,6 +16,19 @@ TOKEN_URL = "https://id.barentswatch.no/connect/token"
 API_BASE = "https://www.barentswatch.no/bwapi"
 TIMEOUT_SECONDS = 20
 
+TABLE_STRUCTURE = {
+    "row_definition": "One provider-reported week for the requested aquaculture locality and year.",
+    "column_descriptions": {
+        "locality_id": "BarentsWatch aquaculture locality identifier.",
+        "year": "Requested reporting year.",
+        "week": "Reporting week as supplied by BarentsWatch.",
+        "value": "Provider-reported weekly mean adult female lice per fish.",
+    },
+    "preparation": "Add the requested locality ID and year to the provider's weekly records. Preserve provider fields and values; no averages are computed by this server.",
+    "missing_values": "Absent weeks are omitted. Null values become empty CSV cells; supplied zeroes remain zero. Consult the source notes before interpreting zeroes.",
+    "additional_columns": "Extra fields returned by the provider are retained with their original names.",
+}
+
 
 class BarentsWatchError(RuntimeError):
     """An authenticated BarentsWatch request could not be completed."""
@@ -106,6 +119,7 @@ def lice_by_locality(locality_id: int, year: int) -> dict:
         "year": year,
         "indicator": payload.get("type", "avgAdultFemaleLice"),
         "unit": "adult female lice per fish",
+        "table_structure": TABLE_STRUCTURE,
         "rows": [
             {"locality_id": locality_id, "year": year, **item}
             for item in payload["data"]

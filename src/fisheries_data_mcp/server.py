@@ -17,7 +17,19 @@ load_local_credentials()  # Copernicus Marine reads environment credentials duri
 from . import barentswatch, copernicus, fishstat
 
 
-mcp = MCPServer("Fisheries Data")
+mcp = MCPServer(
+    "Fisheries Data",
+    instructions=(
+        "Find, describe and download fisheries and marine datasets. "
+        "Use list_data_sources to check coverage and output structure. "
+        "Clarify ambiguous species, countries, periods, variables or table structure before downloading. "
+        "Explain the delivered fields, units, selection, missing values and source citation. "
+        "FishStat country totals are documented query aggregations. "
+        "This server supplies data for subsequent analysis; it does not fit models, test hypotheses, "
+        "interpret scientific results or join data sources. State when a requested dataset or table "
+        "structure is unsupported instead of inventing data."
+    ),
+)
 
 
 def _output_dir() -> Path:
@@ -25,7 +37,7 @@ def _output_dir() -> Path:
     return Path(configured).expanduser() if configured else Path.home() / "fisheries-data-mcp" / "exports"
 
 
-def _export_rows(rows: list[dict], metadata: dict, label: str) -> dict[str, str]:
+def _export_rows(rows: list[dict], metadata: dict, label: str) -> dict:
     if not rows:
         return {}
     directory = _output_dir()
@@ -34,6 +46,14 @@ def _export_rows(rows: list[dict], metadata: dict, label: str) -> dict[str, str]
     stem = f"{slug}-{datetime.now(timezone.utc):%Y%m%dT%H%M%SZ}-{uuid4().hex[:8]}"
     csv_path = directory / f"{stem}.csv"
     columns = list(dict.fromkeys(key for row in rows for key in row))
+    table_structure = {
+        **metadata.get("table_structure", {}),
+        "columns": columns,
+        "row_count": len(rows),
+        "csv_encoding": "UTF-8 with BOM",
+        "nested_values": "Lists and objects are JSON-encoded within CSV cells.",
+    }
+    metadata = {**metadata, "table_structure": table_structure}
     with csv_path.open("w", newline="", encoding="utf-8-sig") as handle:
         writer = csv.DictWriter(handle, fieldnames=columns)
         writer.writeheader()
@@ -48,7 +68,10 @@ def _export_rows(rows: list[dict], metadata: dict, label: str) -> dict[str, str]
     metadata_path.write_text(
         json.dumps(metadata, ensure_ascii=False, indent=2, default=str), encoding="utf-8"
     )
-    return {"csv_path": str(csv_path), "metadata_path": str(metadata_path)}
+    return {
+        "csv_path": str(csv_path), "metadata_path": str(metadata_path),
+        "table_structure": table_structure,
+    }
 
 
 def _tool_error(exc: Exception) -> ToolError:
@@ -57,7 +80,7 @@ def _tool_error(exc: Exception) -> ToolError:
 
 @mcp.tool()
 def list_data_sources() -> dict:
-    """List connected sources and their coverage so the assistant can choose the right one."""
+    """List available sources, coverage and output structure before choosing a dataset to download."""
     return {
         "sources": [
             {
@@ -66,6 +89,7 @@ def list_data_sources() -> dict:
                 "covers": "Annual aquatic capture and aquaculture production by country, species and area; 1950-2024 in release 2026.1.0.",
                 "tools": ["search_fishstat_species", "fishstat_production_by_country"],
                 "url": "https://www.fao.org/fishery/static/Data/",
+                "table_structure": fishstat.TABLE_STRUCTURE,
             },
             {
                 "id": "barentswatch",
@@ -73,6 +97,7 @@ def list_data_sources() -> dict:
                 "covers": "Norwegian aquaculture locality data, including weekly salmon lice reports.",
                 "tools": ["barentswatch_lice_by_locality"],
                 "url": "https://developer.barentswatch.no/docs/fishhealth/",
+                "table_structure": barentswatch.TABLE_STRUCTURE,
             },
             {
                 "id": "copernicus_marine",
@@ -80,9 +105,10 @@ def list_data_sources() -> dict:
                 "covers": "Ocean observations, reanalyses and forecasts by variable, area, time and depth.",
                 "tools": ["search_copernicus_datasets", "describe_copernicus_dataset", "subset_copernicus_dataset"],
                 "url": "https://data.marine.copernicus.eu/",
+                "output_structure": "NetCDF or Zarr subset; CSV when supported by the installed Toolbox. Variables, units and dimensions depend on the dataset: call describe_copernicus_dataset before downloading. The server does not calculate spatial or temporal averages.",
             },
         ],
-        "scope_note": "These sources have different units and spatial and temporal scales. Do not join or sum them without an explicit method.",
+        "scope_note": "Search, describe and download data with source metadata. The server prepares source-specific selections and documented country totals; statistical analysis, scientific interpretation and joins between sources are outside its scope.",
     }
 
 
@@ -99,7 +125,7 @@ def search_fishstat_species(query: str, limit: int = 20) -> dict:
 def fishstat_production_by_country(
     query: str, year: int, source: str = "all", species_code: str = ""
 ) -> dict:
-    """Find annual production tonnes by FAO country/area for an aquatic species or group; export a CSV. Source: all, capture or aquaculture. Optionally set an exact ASFIS species_code. The weight basis depends on the species group."""
+    """Download a CSV of annual production tonnes grouped by FAO country/area for an aquatic species or group. Sums selected observations across species and areas. Source: all, capture or aquaculture. Optionally set an exact ASFIS species_code. Returns table structure, weight basis, quality flags and provenance."""
     try:
         result = fishstat.production_by_country(query, year, source, species_code or None)
         result.update(_export_rows(result.get("rows", []), {k: v for k, v in result.items() if k != "rows"}, f"fishstat-{query}-{year}"))
@@ -110,7 +136,7 @@ def fishstat_production_by_country(
 
 @mcp.tool()
 def barentswatch_lice_by_locality(locality_id: int, year: int) -> dict:
-    """Retrieve weekly mean adult female salmon lice for a Norwegian aquaculture locality and year."""
+    """Download provider-reported weekly mean adult female salmon lice for a Norwegian aquaculture locality and year, with table structure and provenance. The means are supplied by BarentsWatch."""
     try:
         result = barentswatch.lice_by_locality(locality_id, year)
         result.update(_export_rows(result.get("rows", []), {k: v for k, v in result.items() if k != "rows"}, f"barentswatch-lice-{locality_id}-{year}"))

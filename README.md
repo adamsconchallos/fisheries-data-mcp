@@ -1,6 +1,8 @@
 # Fisheries Data MCP
 
-A local [Model Context Protocol](https://modelcontextprotocol.io/) server for research queries across three marine data sources. Install it on your own computer, connect it to an MCP-compatible AI client, and ask questions in ordinary language. The server supplies data and provenance; your AI client writes the answer.
+A local [Model Context Protocol](https://modelcontextprotocol.io/) server to **find, describe and download fisheries and marine data through natural-language requests**. Install it on your computer and connect it to an MCP-compatible AI client. The server delivers data files with source information and explains their structure so you can use them in your own research.
+
+Its scope is data access and preparation: selecting records, downloading bounded subsets, and producing documented country totals where supported. Statistical analysis, modelling, scientific interpretation and joins between sources are outside the server's scope.
 
 **New to GitHub or MCP?** Start with the [beginner FAQ and quick start](FAQ.md). It covers downloading or cloning without a GitHub account, installing without VS Code, and connecting Codex or Claude Desktop Chat.
 
@@ -12,73 +14,57 @@ A local [Model Context Protocol](https://modelcontextprotocol.io/) server for re
 | [BarentsWatch Fish Health](https://developer.barentswatch.no/docs/fishhealth/) | Weekly mean adult female salmon lice for a Norwegian aquaculture locality and year | Your own registered API client ID and secret |
 | [Copernicus Marine](https://help.marine.copernicus.eu/en/articles/7949409-copernicus-marine-toolbox-introduction) | Search the live marine catalogue, describe variables and units, then download a bounded subset by variable, area and dates | Your own Copernicus Marine account |
 
-The sources describe different quantities and spatial scales. Results are kept separate unless the researcher specifies a comparison method. Current BarentsWatch coverage requires a locality ID; searching locality names is not yet provided.
+The sources describe different quantities and spatial scales, and each download retains its source and units. Current BarentsWatch coverage requires a locality ID; searching locality names is not yet provided. Comtrade is planned and is not yet connected.
 
 ## Install locally
 
-Requires Python 3.11 or newer. In a clone of this repository:
+Requires Python 3.11 or newer. Download or clone this repository, open a terminal in its folder, and run one command:
 
 **Windows PowerShell**
 
 ```powershell
-py -3 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install .
+py -3 install.py
 ```
 
 **macOS/Linux**
 
 ```bash
-python3 -m venv .venv
-.venv/bin/python -m pip install .
+python3 install.py
 ```
 
-Point an MCP client that supports local **stdio** servers at the installed executable. For clients that use `mcpServers` JSON, the entry is:
+The installer creates or reuses `.venv`, installs the server, creates an empty `.env` template if needed, and generates `mcp-config.json` with the correct absolute executable path. Rerunning it updates the package and preserves your existing `.env`.
 
-```json
-{
-  "mcpServers": {
-    "fisheries-data": {
-      "command": "ABSOLUTE_PATH_TO_VENV/fisheries-data-mcp"
-    }
-  }
-}
-```
+Connect a client that supports local **stdio** MCP servers. If the client uses `mcpServers` JSON, copy the `fisheries-data` entry from the generated `mcp-config.json` into its configuration. If it asks for an executable, use the path printed by the installer. Configuration locations vary by client; the [FAQ](FAQ.md) explains the steps. Restart the client after adding the server.
 
-On Windows, use the absolute path to `.venv\\Scripts\\fisheries-data-mcp.exe`, with doubled backslashes inside JSON. On macOS/Linux, use `.venv/bin/fisheries-data-mcp`. Configuration file location and field names vary by AI client. Restart the client after adding the server; it should discover the tools automatically.
-
-For **Codex CLI**, the [official MCP setup](https://developers.openai.com/learn/docs-mcp) uses `codex mcp add`. Substitute the absolute path to your installed executable:
+For **Codex CLI**, the [official MCP setup](https://developers.openai.com/learn/docs-mcp) uses `codex mcp add`. From the repository folder on Windows:
 
 ```powershell
-codex mcp add fisheries-data -- "C:\full\path\to\fisheries_data_mcp\.venv\Scripts\fisheries-data-mcp.exe"
+$server = (Resolve-Path .\.venv\Scripts\fisheries-data-mcp.exe).Path
+codex mcp add fisheries-data -- $server
 codex mcp list
 ```
 
-For **Claude Desktop Chat**, place the JSON entry above in `claude_desktop_config.json` and restart the app. The [MCP Python SDK guide](https://py.sdk.modelcontextprotocol.io/get-started/real-host/) gives the configuration file locations for Windows and macOS. This JSON configuration does not connect the server to Claude Cowork; see the [FAQ](FAQ.md#does-the-same-setup-work-in-claude-cowork).
+For **Claude Desktop Chat**, add the entry from `mcp-config.json` to `claude_desktop_config.json` and restart the app. Preserve other entries if the file already exists. The [MCP Python SDK guide](https://py.sdk.modelcontextprotocol.io/get-started/real-host/) gives the configuration file locations for Windows and macOS. This JSON configuration does not connect the server to Claude Cowork; see the [FAQ](FAQ.md#does-the-same-setup-work-in-claude-cowork).
 
 Try this prompt (Spanish or English):
 
 > ¿Qué países produjeron ostras en 2024 y cuántas toneladas produjo cada uno? Usa FishStat, incluye captura y acuicultura, exporta un CSV y cita la fuente y la definición de «ostras».
 
-The `fishstat_production_by_country` tool returns all matching country rows and writes a CSV plus a metadata JSON file. By default, exports go to `~/fisheries-data-mcp/exports`; set `FISHERIES_MCP_OUTPUT_DIR` to choose another local directory. The server never requires an AI service account itself; a natural-language prompt requires an MCP-compatible AI client.
+The `fishstat_production_by_country` tool returns all matching country rows and writes a CSV plus a metadata JSON file. FishStat and BarentsWatch CSV exports list the actual columns and row count, with descriptions for their standard fields, units, missing values and data preparation. Copernicus returns dataset metadata; file structure depends on the dataset and format. `list_data_sources` describes available output structures before a download. By default, exports go to `~/fisheries-data-mcp/exports`; set `FISHERIES_MCP_OUTPUT_DIR` to choose another local directory. The server never requires an AI service account itself; a natural-language prompt requires an MCP-compatible AI client.
 
 ## Credentials
 
-For BarentsWatch and Copernicus Marine, copy the example file into the repository folder and edit the copy:
+The installer creates `.env` in the repository folder. Open it in a text editor and fill in the credentials for BarentsWatch and/or Copernicus Marine. On Windows:
 
 **Windows PowerShell**
 
 ```powershell
-Copy-Item .env.example .env
 notepad .env
 ```
 
-**macOS/Linux**
-
-```sh
-cp .env.example .env
-```
-
 Fill in only the credentials you use; leave other lines empty. Save the file and restart your AI client. The server finds this `.env` next to the project's `.venv` even when the client starts it from another folder. No credential entries are needed in the Codex or Claude Desktop MCP configuration. Existing operating-system environment variables take precedence over `.env` values.
+
+If you installed manually, copy `.env.example` to `.env` once, only if `.env` does not already exist.
 
 `.env` is ignored by Git but stores secrets as plain text. Keep it private. If your repository is in a synced folder such as OneDrive, the file may sync too; use a local, unsynced clone for credentials or point `FISHERIES_MCP_ENV_FILE` to an absolute path outside the synced folder.
 
@@ -114,7 +100,7 @@ Copernicus Marine subsets are saved to `~/fisheries-data-mcp/exports` (or `FISHE
 
 ## Scientific use
 
-- FishStat production is annual tonnes: animals are reported in live weight and aquatic plants in wet weight. The server records the release, selected species, source (capture/aquaculture), and FAO quality flags. A suppressed or missing value is never interpreted as a real zero.
+- FishStat production is annual tonnes: animals are reported in live weight and aquatic plants in wet weight. Country tables sum the selected records across species and areas; `source=all` combines capture and aquaculture. The server records this preparation, the release, selected species, source, and FAO quality flags. A suppressed or missing value is never interpreted as a real zero.
 - BarentsWatch Fish Health provides raw reported data, which may contain errors. Missing weeks are not filled. Credit BarentsWatch and the original data owner. [API terms](https://www.barentswatch.no/en/articles/api-terms-and-conditions/).
 - Copernicus Marine results include the dataset ID and available product citation information. Cite the [product DOI](https://help.marine.copernicus.eu/en/articles/4444611-citing-copernicus-marine-products-and-services) and record the dataset version and query parameters.
 - The MIT license in this repository applies to the code. FAO data, BarentsWatch data, and Copernicus Marine products retain their own terms and attribution requirements. [FAO terms](https://www.fao.org/contact-us/terms/db-terms-of-use/en/).
@@ -134,3 +120,5 @@ The checks use small fixtures or mocked API responses. The FishStat oyster examp
 ## Development scope
 
 This is an early read-only release. It currently offers one BarentsWatch Fish Health measure and one Copernicus subset workflow. The server will need updates when source schemas or API routes change; MCP tool discovery does not repair upstream changes automatically.
+
+New sources should follow the same local setup and data-access scope: document coverage and fields, expose search/description/download tools as appropriate, preserve source units and quality flags, and return a local file with provenance. Optional credentials belong in `.env.example` and the loader's allowed credential names; existing sources must work without accounts for the new source. Comtrade is the next planned source.

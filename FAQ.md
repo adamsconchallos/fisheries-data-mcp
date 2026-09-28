@@ -2,6 +2,8 @@
 
 This guide is for researchers who want to ask questions through an AI client and receive source-backed fisheries data and CSV files. The server runs on **your computer**. The AI client starts it and discovers its tools.
 
+The server finds, describes and downloads data. It explains columns, units and data preparation; statistical analyses and scientific interpretation belong in your subsequent research workflow.
+
 ## What do I need?
 
 | Item | Needed? |
@@ -31,23 +33,21 @@ For GitHub basics, see [GitHub's cloning guide](https://docs.github.com/en/repos
 
 ## How do I install the server?
 
-Install [Python 3.11 or newer](https://www.python.org/downloads/) first. In the repository folder, run the commands for your system:
+Install [Python 3.11 or newer](https://www.python.org/downloads/) first. In the repository folder, run one command for your system:
 
 **Windows PowerShell**
 
 ```powershell
-py -3 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install .
+py -3 install.py
 ```
 
 **macOS/Linux**
 
 ```sh
-python3 -m venv .venv
-.venv/bin/python -m pip install .
+python3 install.py
 ```
 
-The final `.` means “install the project in this folder.” The installation downloads Python dependencies; the first FishStat query also downloads and caches the FAO data ZIP. You do **not** need the FishStat desktop `.exe`.
+The installer prepares the `.venv` environment and downloads Python dependencies. It also creates `.env` for optional credentials and `mcp-config.json` with your server's absolute path. Existing `.env` credentials are preserved when you rerun it. The first FishStat query downloads and caches the FAO data ZIP. You do **not** need the FishStat desktop `.exe`.
 
 ## How do I use it with Codex?
 
@@ -80,40 +80,23 @@ Install and open [Claude Desktop](https://claude.com/download) once. Edit its `c
 | Windows | `%APPDATA%\Claude\claude_desktop_config.json` |
 | macOS | `~/Library/Application Support/Claude/claude_desktop_config.json` |
 
-Add an `mcpServers` entry with the **absolute path** to the executable you installed. For example, on Windows:
+Open the generated `mcp-config.json` in the repository folder. It already contains the correct absolute path, including JSON escaping on Windows. If `claude_desktop_config.json` does not exist, create it with that content. If it already exists, add only the `fisheries-data` entry inside its existing `mcpServers` object and preserve the other settings.
 
-```json
-{
-  "mcpServers": {
-    "fisheries-data": {
-      "command": "C:\\Users\\YOUR_NAME\\path\\to\\fisheries-data-mcp\\.venv\\Scripts\\fisheries-data-mcp.exe"
-    }
-  }
-}
-```
-
-On macOS, the `command` is the absolute path ending in `/fisheries-data-mcp/.venv/bin/fisheries-data-mcp`. Replace the example path with your real path. If the file already has other servers, add this entry within its existing `mcpServers` object rather than replacing the file. Fully quit and reopen Claude Desktop, then check the available connectors/tools in **Chat**. The [MCP Python SDK guide](https://py.sdk.modelcontextprotocol.io/get-started/real-host/) explains these configuration paths and restart behavior.
+Fully quit and reopen Claude Desktop, then check the available connectors/tools in **Chat**. The [MCP Python SDK guide](https://py.sdk.modelcontextprotocol.io/get-started/real-host/) explains these configuration paths and restart behavior. The installer generates the entry but does not register it in your AI client automatically.
 
 ## How do data-source credentials reach the local server?
 
 The MCP server reads a `.env` file from this repository when your AI client starts it. You do not need to put credentials in Codex's `config.toml`, Claude Desktop's JSON, or an AI prompt. FishStat needs no credentials.
 
-From the repository folder, make a private copy of the example file:
+The installer has already created `.env` in the repository folder. Open it in a text editor. On Windows:
 
 **Windows PowerShell**
 
 ```powershell
-Copy-Item .env.example .env
 notepad .env
 ```
 
-**macOS/Linux**
-
-```sh
-cp .env.example .env
-```
-
-Open `.env` in a text editor on macOS/Linux. Fill in only the sources you want to use; the empty lines are ignored:
+Fill in only the sources you want to use; the empty lines are ignored:
 
 ```dotenv
 BARENTSWATCH_CLIENT_ID=your_full_client_id
@@ -125,6 +108,8 @@ COPERNICUSMARINE_SERVICE_PASSWORD=your_password
 Register a [BarentsWatch API client](https://developer.barentswatch.no/docs/appreg/) to obtain its ID and secret. Create a [Copernicus Marine account](https://help.marine.copernicus.eu/en/articles/4220332-how-to-register-for-copernicus-marine-service) for its username and password. You can leave either pair empty until you need that source. If the official Copernicus Toolbox has already saved your credentials through `copernicusmarine login`, leave its `.env` lines empty. Catalogue searches and dataset descriptions do not need a Copernicus login; downloads do.
 
 Save `.env` and fully restart Codex or Claude Desktop Chat. The server locates the file next to the project's `.venv`, regardless of the AI client's working directory. Existing operating-system environment variables take precedence. The `.env` file is ignored by Git but contains plain-text secrets; keep it private. If the repository is in OneDrive or another synced folder, `.env` may sync too. You can keep credentials in a local, unsynced clone, or set `FISHERIES_MCP_ENV_FILE` to the absolute path of a private `.env` elsewhere.
+
+For a manual installation, copy `.env.example` to `.env` once if `.env` does not already exist.
 
 ## Does the same setup work in Claude Cowork?
 
@@ -138,6 +123,14 @@ For a first query, ask your connected AI client:
 
 The FishStat tool writes a CSV and a metadata JSON file, by default under `~/fisheries-data-mcp/exports`. You can set `FISHERIES_MCP_OUTPUT_DIR` to choose another folder. The [README](README.md#current-coverage) lists the current tools and the extra credentials needed for BarentsWatch and Copernicus Marine.
 
+You can also ask: "Before downloading, explain what each row and column represents, the units and the available years." FishStat and BarentsWatch CSV exports list the actual columns and row count, with descriptions for their standard fields. FishStat's country table groups and sums the selected source records; BarentsWatch preserves the provider's reported weekly means. Copernicus downloads a subset without calculating averages and returns dataset metadata; its file structure varies by dataset and format.
+
+## Will adding more sources require a new installation for each one?
+
+New sources will be added to this same server. Updating the project will make their tools available through your existing connection. Fill in any optional credentials for the sources you want to use; an account for every provider is not required. Comtrade is planned but is not yet available.
+
 ## How do I update it or fix a missing tool?
 
-If you cloned the repository, run `git pull` from its folder, then repeat the platform-specific `pip install .` command above. If you downloaded a ZIP, download the latest ZIP and install from its extracted folder. After moving the folder, update the executable path in your MCP client. If a tool is missing, verify that the executable exists in `.venv`, that the client points to its **absolute path**, and that you restarted the client. The first FishStat query may take longer while the FAO ZIP downloads.
+If you cloned the repository, run `git pull` from its folder, then rerun `py -3 install.py` on Windows or `python3 install.py` on macOS/Linux. Your existing `.env` is preserved. If a new source needs extra credentials, copy its new field names from `.env.example` into `.env` and fill them in only if needed.
+
+If you downloaded a ZIP, download the latest ZIP and install from its extracted folder; transfer your private `.env` to that folder if you want to retain your credentials. After moving the folder, update the executable path in your MCP client using the newly generated `mcp-config.json`. If a tool is missing, verify that the executable exists in `.venv`, that the client points to its **absolute path**, and that you restarted the client. The first FishStat query may take longer while the FAO ZIP downloads.

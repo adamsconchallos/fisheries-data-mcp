@@ -1,5 +1,6 @@
 """Check that a real MCP client can discover and call a data tool."""
 
+import csv
 import json
 import os
 import sys
@@ -11,6 +12,7 @@ from unittest.mock import patch
 import copernicusmarine
 from mcp import Client, StdioServerParameters
 
+from fisheries_data_mcp import fishstat
 from fisheries_data_mcp.server import mcp
 
 
@@ -39,6 +41,7 @@ class ServerTests(unittest.IsolatedAsyncioTestCase):
             "year": 2024,
             "source": "all",
             "unit": "tonnes live weight",
+            "table_structure": fishstat.TABLE_STRUCTURE,
             "source_url": "https://www.fao.org/fishery/static/Data/GlobalProduction_2026.1.0.zip",
             "rows": [{"country": "Example", "country_code": "999", "year": 2024, "tonnes": 12.5, "status": "A", "warnings": []}],
         }
@@ -59,6 +62,16 @@ class ServerTests(unittest.IsolatedAsyncioTestCase):
                     self.assertEqual(output["rows"][0]["tonnes"], 12.5)
                     self.assertTrue(Path(output["csv_path"]).is_file())
                     self.assertTrue(Path(output["metadata_path"]).is_file())
+                    with Path(output["csv_path"]).open(encoding="utf-8-sig", newline="") as handle:
+                        table = csv.DictReader(handle)
+                        self.assertEqual(output["table_structure"]["columns"], table.fieldnames)
+                        self.assertEqual(output["table_structure"]["row_count"], len(list(table)))
+                    saved_metadata = json.loads(Path(output["metadata_path"]).read_text(encoding="utf-8"))
+                    self.assertEqual(saved_metadata["table_structure"], output["table_structure"])
+                    self.assertEqual(
+                        set(output["table_structure"]["column_descriptions"]),
+                        set(output["table_structure"]["columns"]),
+                    )
 
 
 if __name__ == "__main__":

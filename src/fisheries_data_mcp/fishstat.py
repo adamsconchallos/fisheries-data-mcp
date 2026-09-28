@@ -26,6 +26,20 @@ ZIP_NAME = f"GlobalProduction_{DATASET_VERSION}.zip"
 SOURCE_URL = f"https://www.fao.org/fishery/static/Data/{ZIP_NAME}"
 MEASURE = "Q_tlw"  # FAO's quantity code; plants are reported in wet weight.
 
+TABLE_STRUCTURE = {
+    "row_definition": "One FAO country/area for the requested year and species/source selection.",
+    "column_descriptions": {
+        "country": "FAO country/area name.",
+        "country_code": "UN country/area code used by FAO; retain as text.",
+        "year": "Production year.",
+        "tonnes": "Sum of available production quantities; see weight_basis for live or wet weight.",
+        "status": "Comma-separated FAO flags from the selected observations; see status_legend.",
+        "warnings": "Warnings about the selected observations; a JSON list in the CSV cell.",
+    },
+    "preparation": "Filter by species, year and production source, then sum available quantities by country across selected species and areas. Source 'all' combines capture and aquaculture.",
+    "missing_values": "Q observations are excluded from the sum. Totals with some Q observations are partial; tonnes is empty when all selected observations for a country are Q. Countries with no observations are omitted.",
+}
+
 _SOURCES = {
     "all": {"CAPTURE", "FRESHWATER", "BRACKISHWATER", "MARINE"},
     "capture": {"CAPTURE"},
@@ -221,6 +235,7 @@ def production_by_country(
         "measure": MEASURE,
         "unit": "tonnes",
         "weight_basis": None,
+        "table_structure": TABLE_STRUCTURE,
         **_provenance(),
         "species": [],
         "matched_species_count": 0,
